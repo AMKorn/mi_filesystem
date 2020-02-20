@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv){
     if(!argv[1] || !argv[2]){
-        fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <nbloques>");
+        fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <nbloques>\n");
         return EXIT_FAILURE;
     }
     bmount(DISCO);
