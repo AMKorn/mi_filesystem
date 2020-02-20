@@ -1,13 +1,17 @@
 #include "bloques.c"
-
+#define DISCO argv[1]
+#define NUM_BLOQUES  atoi(argv[2])
 
 int main(int argc, char **argv){
-    bmount(argcv[1]);
-    unsigned int amount = atoi(argv[2]);
-    unsigned char[] *buf = new unsigned char[BLOCKSIZE];
-    memset(buf);
-    for(unsigned int i=0; i<amount; i++){
-        bwrite(i, buf[i]);
+    if(!argv[1] || !argv[2]){
+        fprintf(stderr, "Argumentos: <nombre_dispositivo> <nbloques>");
+        return EXIT_FAILURE;
     }
-    bunmount();
+    bmount(DISCO);
+    unsigned char buf[BLOCKSIZE];
+    memset(buf, 0, BLOCKSIZE);
+    for(unsigned int i=0; i<NUM_BLOQUES; i++){
+        bwrite(i, buf);
+    }
+    bumount();
 }
