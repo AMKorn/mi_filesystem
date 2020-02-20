@@ -1,10 +1,11 @@
-#include "bloques.c"
+#include "bloques.h"
+
 #define DISCO argv[1]
-#define NUM_BLOQUES  atoi(argv[2])
+#define NUM_BLOQUES atoi(argv[2])
 
 int main(int argc, char **argv){
     if(!argv[1] || !argv[2]){
-        fprintf(stderr, "Argumentos: <nombre_dispositivo> <nbloques>");
+        fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <nbloques>");
         return EXIT_FAILURE;
     }
     bmount(DISCO);
