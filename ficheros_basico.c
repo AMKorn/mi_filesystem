@@ -54,11 +54,19 @@ struct inodo {       //comprobar que ocupa 128 bytes haciendo un sizeof(inodo)!!
 
 
 int tamMB(unsigned int nbloques){
-   int tam = (nbloques/8)%BLOCKSIZE;
+   int tam = (nbloques/8)/BLOCKSIZE;
+   if((nbloques/8)%BLOCKSIZE){
+      tam++;
+   }
+   return tam;
 }
 
 int tamAI(unsigned int ninodos){
-   int tam = (ninodos*INODOSIZE)%BLOCKSIZE;
+   int tam = (ninodos*INODOSIZE)/BLOCKSIZE;
+   if((ninodos*INODOSIZE)%BLOCKSIZE){
+      tam++;
+   }
+   return tam;
 }
 
 int initSB(unsigned int nbloques, unsigned int ninodos){
