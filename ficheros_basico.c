@@ -1,5 +1,7 @@
 #include "ficheros_basico.h"
 
+static struct superbloque SB;
+
 int tamMB(unsigned int nbloques){
    int tam = (nbloques/8)/BLOCKSIZE;
    if((nbloques/8)%BLOCKSIZE){
@@ -17,8 +19,8 @@ int tamAI(unsigned int ninodos){
 }
 
 int initSB(unsigned int nbloques, unsigned int ninodos){
-   struct superbloque SB;
-   SB.posPrimerBloqueMB = 1;
+   int posSB = 0; int tamSB = 1;
+   SB.posPrimerBloqueMB = posSB + tamSB;
    SB.posUltimoBloqueMB = SB.posPrimerBloqueMB+tamMB(nbloques)-1;
    SB.posPrimerBloqueAI = SB.posUltimoBloqueMB+1;
    SB.posUltimoBloqueAI = SB.posPrimerBloqueAI+tamAI(ninodos)-1;
@@ -30,12 +32,17 @@ int initSB(unsigned int nbloques, unsigned int ninodos){
    SB.cantInodosLibres = ninodos;
    SB.totBloques = nbloques;
    SB.totInodos = ninodos;
-   bwrite()
+   bwrite(posSB, SB);
 }
 
 int initMB(){
-
+   unsigned char* buffer = char[BLOCKSIZE]; 
+   memset(buffer, 0, BLOCKSIZE);
+   int i = tamMB(SB.totBloques);
+   for(int j=SB.posPrimerBloqueMB; j<i; j++){
+      bwrite(j, buffer);
+   }
 }
 int initAI(){
-
+   struct inodo inodos[BLOCKSIZE/INODOSIZE];
 }
