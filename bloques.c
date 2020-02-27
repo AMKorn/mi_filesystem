@@ -9,7 +9,8 @@ static int descriptor = 0;
  * @return the file descriptor of the opened file.
  * */
 int bmount(const char *camino){
-    descriptor = open(camino, O_RDWR|O_CREAT, 0666);
+    umask(000);
+    descriptor = open(camino, O_RDWR|O_CREAT, 110);
     if(descriptor == -1){
         fprintf(stderr, "Error %d: %s", errno, strerror(errno));
     }
