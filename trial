@@ -2,3 +2,4 @@ make
 ./mi_mkfs disco 100000
 ls -l disco
 rm disco
+make clean

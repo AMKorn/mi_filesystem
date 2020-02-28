@@ -2,9 +2,9 @@ CC=gcc
 CFLAGS=-c -g -Wall -std=gnu99
 #LDFLAGS=-pthread
 
-SOURCES=bloques.c mi_mkfs.c #todos los .c
+SOURCES=bloques.c mi_mkfs.c ficheros_basico.c #todos los .c
 LIBRARIES=bloques.o #todos los .o de la biblioteca del SF
-INCLUDES=bloques.h #todos los .h
+INCLUDES=bloques.h ficheros_basico.h #todos los .h
 PROGRAMS=mi_mkfs
 OBJS=$(SOURCES:.c=.o)
 

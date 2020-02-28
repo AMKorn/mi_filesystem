@@ -1,5 +1,6 @@
 #include "bloques.c"
 #include <time.h>
+#include <limits.h>
 
 #define INODOSIZE 128
 

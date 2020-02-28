@@ -1,4 +1,4 @@
-#include "ficheros_basico.h"
+ #include "ficheros_basico.h"
 
 static struct superbloque SB;
 
@@ -20,7 +20,7 @@ int tamAI(unsigned int ninodos){
 
 int initSB(unsigned int nbloques, unsigned int ninodos){
    int posSB = 0; int tamSB = 1;
-   SB.posPrimerBloqueMB = posSB + tamSB;
+   SB.posPrimerBloqueMB = posSB+tamSB;
    SB.posUltimoBloqueMB = SB.posPrimerBloqueMB+tamMB(nbloques)-1;
    SB.posPrimerBloqueAI = SB.posUltimoBloqueMB+1;
    SB.posUltimoBloqueAI = SB.posPrimerBloqueAI+tamAI(ninodos)-1;
@@ -32,17 +32,43 @@ int initSB(unsigned int nbloques, unsigned int ninodos){
    SB.cantInodosLibres = ninodos;
    SB.totBloques = nbloques;
    SB.totInodos = ninodos;
-   bwrite(posSB, SB);
+   bwrite(posSB, &SB);
+   return EXIT_SUCCESS;
 }
 
 int initMB(){
-   unsigned char* buffer = char[BLOCKSIZE]; 
+   unsigned char buffer[BLOCKSIZE]; 
    memset(buffer, 0, BLOCKSIZE);
-   int i = tamMB(SB.totBloques);
-   for(int j=SB.posPrimerBloqueMB; j<i; j++){
-      bwrite(j, buffer);
+   int pos = SB.posPrimerBloqueMB;
+   while(buffer[pos]){
+      bwrite(pos, &buffer[pos]);
+      pos++;
    }
+   return EXIT_SUCCESS;
 }
 int initAI(){
    struct inodo inodos[BLOCKSIZE/INODOSIZE];
+   int contInodos = SB.posPrimerInodoLibre+1;
+   for(int i=SB.posPrimerBloqueAI; i<=SB.posUltimoBloqueAI; i++){
+      for(int j=0; j<BLOCKSIZE/INODOSIZE; j++){
+         inodos[j].tipo = 'l';
+         if(contInodos<SB.totInodos){
+            inodos[j].punterosDirectos[0] = contInodos;
+            contInodos++;
+         } else {
+            inodos[j].punterosDirectos[0] = UINT_MAX;
+         }
+      }
+      bwrite(i, &inodos[i]);
+   }
+   /*
+   struct inodo inodos[BLOCKSIZE/INODOSIZE];
+   int pos = SB.posPrimerBloqueAI;
+   for(int i=0; i<sizeof(inodos)-1; i++){
+      inodos[pos].punterosDirectos[0] = i;
+      pos++;
+   }
+   inodos[pos].punterosDirectos[0] = UINT_MAX;
+   */
+  return EXIT_SUCCESS;
 }
