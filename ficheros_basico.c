@@ -77,6 +77,19 @@ int initAI(){
 
 //Nivel 3
 int escribir_bit(unsigned int nbloque, unsigned int bit){
+   int posMB = SB.posPrimerBloqueMB;
+   int posbyte = nbloque/8;
+   int postbit = nbloque%8;
+   int nbloqueMB = posbyte/BLOCKSIZE;
+   int nbloqueabs = nbloqueMB + SB.posPrimerBloqueMB;
+
+   int bufferMB [BLOCKSIZE];
+   posbyte = posbyte % BLOCKSIZE;
+   unsigned char mascara = 128;
+   mascara >>=posbit;               //Desplazamiento de bits a la derecha
+   bufferMB[posbyte] |= mascara;    //Operador OR para bits
+   bufferMB[posbyte] &= ~mascara;   //Operador AND y NOT para bits
+   bwrite(nbloqueabs, bufferMB[posbyte]);
    return EXIT_SUCCESS;
 }
 
