@@ -94,6 +94,11 @@ int escribir_bit(unsigned int nbloque, unsigned int bit){
 }
 
 unsigned char leer_bit(unsigned int nbloque){
+   unsigned char mascara = 128;     // 10000000
+   mascara >>= posbit;              // desplazamiento de bits a la derecha
+   mascara &= bufferMB[posbyte];    // operador AND para bits
+   mascara >>= (7-posbit);          // desplazamiento de bits a la derecha
+
    return EXIT_SUCCESS;
 }
 
