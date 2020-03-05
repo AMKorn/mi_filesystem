@@ -77,19 +77,11 @@ int initAI(){
 
 //Nivel 3
 int escribir_bit(unsigned int nbloque, unsigned int bit){
-<<<<<<< HEAD
-   int posMB = SB.posPrimerBloqueMB;
-   int posbyte = nbloque/8;
-   int posbit = nbloque%8;
-   int nbloqueMB = posbyte/BLOCKSIZE;
-   int nbloqueabs = nbloqueMB + SB.posPrimerBloqueMB;
-=======
    unsigned int posMB = SB.posPrimerBloqueMB;
    unsigned int posbyte = nbloque/8;
-   unsigned int postbit = nbloque%8;
+   unsigned int posbit = nbloque%8;
    unsigned int nbloqueMB = posbyte/BLOCKSIZE;
    unsigned int nbloqueabs = nbloqueMB + SB.posPrimerBloqueMB;
->>>>>>> d450985c67d25fad1073f120421143abe283ba3c
 
    int bufferMB [BLOCKSIZE];
    posbyte = posbyte % BLOCKSIZE;
