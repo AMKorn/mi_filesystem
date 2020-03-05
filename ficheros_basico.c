@@ -37,6 +37,7 @@ int initSB(unsigned int nbloques, unsigned int ninodos){
    return EXIT_SUCCESS;
 }
 
+//Hay que implementar Nivel 3 escribir_bit
 int initMB(){
    unsigned char buffer[BLOCKSIZE]; 
    memset(buffer, 0, BLOCKSIZE);
@@ -83,17 +84,32 @@ int escribir_bit(unsigned int nbloque, unsigned int bit){
    unsigned int nbloqueMB = posbyte/BLOCKSIZE;
    unsigned int nbloqueabs = nbloqueMB + SB.posPrimerBloqueMB;
 
-   int bufferMB [BLOCKSIZE];
+   unsigned int bufferMB [BLOCKSIZE];
    posbyte = posbyte % BLOCKSIZE;
    unsigned char mascara = 128;
    mascara >>=posbit;               //Desplazamiento de bits a la derecha
-   bufferMB[posbyte] |= mascara;    //Operador OR para bits
-   bufferMB[posbyte] &= ~mascara;   //Operador AND y NOT para bits
-   bwrite(nbloqueabs, bufferMB[posbyte]);
-   return EXIT_SUCCESS;
+   if(bit==1){
+      bufferMB[posbyte] |= mascara;    //Operador OR para bits
+   } else {
+      bufferMB[posbyte] &= ~mascara;   //Operador AND y NOT para bits
+   }
+   if(bwrite(nbloqueabs, bufferMB[posbyte])){
+      return EXIT_SUCCESS;
+   } else {
+      return EXIT_FAILURE;
+   }
+
 }
 
 unsigned char leer_bit(unsigned int nbloque){
+   unsigned int posMB = SB.posPrimerBloqueMB;
+   unsigned int posbyte = nbloque/8;
+   unsigned int postbit = nbloque%8;
+   unsigned int nbloqueMB = posbyte/BLOCKSIZE;
+   unsigned int nbloqueabs = nbloqueMB + SB.posPrimerBloqueMB;
+   unsigned int bufferMB [BLOCKSIZE];
+   posbyte = posbyte % BLOCKSIZE;
+
    unsigned char mascara = 128;     // 10000000
    mascara >>= posbit;              // desplazamiento de bits a la derecha
    mascara &= bufferMB[posbyte];    // operador AND para bits
@@ -108,7 +124,7 @@ int reservar_bloque(){
       bread(posBloqueMB,bufferMB) 
       int bufferAux [BLOCKSIZE];
       memset (bufferAux, 255, BLOCKSIZE)
-      if(posBloqueMB){
+      if(z){
          
       }
    } else {
