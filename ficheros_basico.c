@@ -123,7 +123,7 @@ int reservar_bloque(){
       //unsigned int posBloqueMB = SB.posPrimerBloqueMB;
       char bufferAux[BLOCKSIZE];
       char bufferMB[BLOCKSIZE];
-      memset (bufferAux, 255, BLOCKSIZE)
+      memset(bufferAux, 255, BLOCKSIZE);
 
       // Finding first MB position with a 0
       char found = false;
