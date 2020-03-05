@@ -2,6 +2,7 @@
 
 static struct superbloque SB;
 
+//Nivel 2
 int tamMB(unsigned int nbloques){
    int tam = (nbloques/8)/BLOCKSIZE;
    if((nbloques/8)%BLOCKSIZE){
@@ -46,6 +47,7 @@ int initMB(){
    }
    return EXIT_SUCCESS;
 }
+
 int initAI(){
    struct inodo inodos[BLOCKSIZE/INODOSIZE];
    int contInodos = SB.posPrimerInodoLibre+1;
@@ -71,4 +73,33 @@ int initAI(){
    inodos[pos].punterosDirectos[0] = UINT_MAX;
    */
   return EXIT_SUCCESS;
+}
+
+//Nivel 3
+int escribir_bit(unsigned int nbloque, unsigned int bit){
+   return EXIT_SUCCESS;
+}
+
+unsigned char leer_bit(unsigned int nbloque){
+   return EXIT_SUCCESS;
+}
+
+int reservar_bloque(){
+   return EXIT_SUCCESS;
+}
+
+int liberar_bloque(unsigned int nbloque){
+   return EXIT_SUCCESS;
+}
+
+int escribir_inodo(unsigned int ninodo, struct inodo inodo){
+   return EXIT_SUCCESS;
+}
+
+int leer_inodo(unsigned int ninodo, struct inodo *inodo){
+   return EXIT_SUCCESS;
+}
+
+int reservar_inodo(unsigned char tipo, unsigned char permisos){
+   return EXIT_SUCCESS;
 }

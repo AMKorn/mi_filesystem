@@ -51,8 +51,19 @@ struct inodo {       //comprobar que ocupa 128 bytes haciendo un sizeof(inodo)!!
    // Hay que restar también lo que ocupen las variables de alineación utilizadas!!!
 };
 
+//Nivel 2
 int tamMB(unsigned int nbloques);
 int tamAI(unsigned int ninodos);
 int initSB(unsigned int nbloques, unsigned int ninodos);
 int initMB();
 int initAI();
+
+//Nivel 3
+int escribir_bit(unsigned int nbloque, unsigned int bit);
+unsigned char leer_bit(unsigned int nbloque);
+int reservar_bloque();
+int liberar_bloque(unsigned int nbloque);
+int escribir_inodo(unsigned int ninodo, struct inodo inodo);
+int leer_inodo(unsigned int ninodo, struct inodo *inodo);
+int reservar_inodo(unsigned char tipo, unsigned char permisos);
+//Nivel
