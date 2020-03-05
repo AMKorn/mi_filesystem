@@ -78,7 +78,7 @@ int initAI(){
 
 //Nivel 3
 int escribir_bit(unsigned int nbloque, unsigned int bit){
-   unsigned int posMB = SB.posPrimerBloqueMB;
+   //unsigned int posMB = SB.posPrimerBloqueMB;
    unsigned int posbyte = nbloque/8;
    unsigned int posbit = nbloque%8;
    unsigned int nbloqueMB = posbyte/BLOCKSIZE;
@@ -102,11 +102,11 @@ int escribir_bit(unsigned int nbloque, unsigned int bit){
 }
 
 unsigned char leer_bit(unsigned int nbloque){
-   unsigned int posMB = SB.posPrimerBloqueMB;
+   //unsigned int posMB = SB.posPrimerBloqueMB;
    unsigned int posbyte = nbloque/8;
-   unsigned int postbit = nbloque%8;
-   unsigned int nbloqueMB = posbyte/BLOCKSIZE;
-   unsigned int nbloqueabs = nbloqueMB + SB.posPrimerBloqueMB;
+   unsigned int posbit = nbloque%8;
+   //unsigned int nbloqueMB = posbyte/BLOCKSIZE;
+   //unsigned int nbloqueabs = nbloqueMB + SB.posPrimerBloqueMB;
    unsigned int bufferMB [BLOCKSIZE];
    posbyte = posbyte % BLOCKSIZE;
 
@@ -166,7 +166,9 @@ int reservar_bloque(){
 }
 
 int liberar_bloque(unsigned int nbloque){
-   return EXIT_SUCCESS;
+   escribir_bit(nbloque, 0);
+   SB.cantBloquesLibres++;
+   return nbloque;
 }
 
 int escribir_inodo(unsigned int ninodo, struct inodo inodo){
