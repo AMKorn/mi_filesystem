@@ -93,7 +93,7 @@ int escribir_bit(unsigned int nbloque, unsigned int bit){
    } else {
       bufferMB[posbyte] &= ~mascara;   //Operador AND y NOT para bits
    }
-   if(bwrite(nbloqueabs, bufferMB[posbyte])){
+   if(bwrite(nbloqueabs, &bufferMB[posbyte])){
       return EXIT_SUCCESS;
    } else {
       return EXIT_FAILURE;
@@ -123,15 +123,16 @@ int reservar_bloque(){
       //unsigned int posBloqueMB = SB.posPrimerBloqueMB;
       char bufferAux[BLOCKSIZE];
       char bufferMB[BLOCKSIZE];
-      memset (bufferAux, 255, BLOCKSIZE)
+      memset(bufferAux, 255, BLOCKSIZE);
 
       // Finding first MB position with a 0
-      char found = false;
-      for(int posBloqueMB = SB.posPrimerBloqueMB; posBloqueMB < SB.totBloques && !found; posBloqueMB++){
+      int found = 0;
+      int posBloqueMB = SB.posPrimerBloqueMB;
+      for(; posBloqueMB < SB.totBloques && found==0; posBloqueMB++){
 
          bread(posBloqueMB,bufferMB);
          if(memcmp(bufferAux, bufferMB, BLOCKSIZE) != 0) {
-            found = true;
+            found = 1;
          }
       }
 
@@ -151,7 +152,7 @@ int reservar_bloque(){
          bufferMB[posbyte] <<= 1; // desplaz. de bits a la izqda
       }
 
-      nbloque = ((posBloqueMB - SB.posPrimerBloqueMB) * BLOCKSIZE+ posbyte) * 8 + posbit;
+      int nbloque = ((posBloqueMB - SB.posPrimerBloqueMB) * BLOCKSIZE+ posbyte) * 8 + posbit;
       escribir_bit(nbloque, 1);
       SB.cantBloquesLibres--;
       //y salvamos el superbloque
