@@ -77,11 +77,11 @@ int initAI(){
 
 //Nivel 3
 int escribir_bit(unsigned int nbloque, unsigned int bit){
-   int posMB = SB.posPrimerBloqueMB;
-   int posbyte = nbloque/8;
-   int postbit = nbloque%8;
-   int nbloqueMB = posbyte/BLOCKSIZE;
-   int nbloqueabs = nbloqueMB + SB.posPrimerBloqueMB;
+   unsigned int posMB = SB.posPrimerBloqueMB;
+   unsigned int posbyte = nbloque/8;
+   unsigned int postbit = nbloque%8;
+   unsigned int nbloqueMB = posbyte/BLOCKSIZE;
+   unsigned int nbloqueabs = nbloqueMB + SB.posPrimerBloqueMB;
 
    int bufferMB [BLOCKSIZE];
    posbyte = posbyte % BLOCKSIZE;
@@ -103,6 +103,18 @@ unsigned char leer_bit(unsigned int nbloque){
 }
 
 int reservar_bloque(){
+   if(SB.cantBloquesLibres>0){
+      unsigned int posBloqueMB = SB.posPrimerBloqueMB;
+      bread(posBloqueMB,bufferMB) 
+      int bufferAux [BLOCKSIZE];
+      memset (bufferAux, 255, BLOCKSIZE)
+      if(posBloqueMB){
+         
+      }
+   } else {
+
+   }
+
    return EXIT_SUCCESS;
 }
 
