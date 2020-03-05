@@ -104,18 +104,49 @@ unsigned char leer_bit(unsigned int nbloque){
 
 int reservar_bloque(){
    if(SB.cantBloquesLibres>0){
-      unsigned int posBloqueMB = SB.posPrimerBloqueMB;
-      bread(posBloqueMB,bufferMB) 
-      int bufferAux [BLOCKSIZE];
+      //unsigned int posBloqueMB = SB.posPrimerBloqueMB;
+      char bufferAux[BLOCKSIZE];
+      char bufferMB[BLOCKSIZE];
       memset (bufferAux, 255, BLOCKSIZE)
-      if(posBloqueMB){
-         
+
+      // Finding first MB position with a 0
+      char found = false;
+      for(int posBloqueMB = SB.posPrimerBloqueMB; posBloqueMB < SB.totBloques && !found; posBloqueMB++){
+
+         bread(posBloqueMB,bufferMB);
+         if(memcmp(bufferAux, bufferMB, BLOCKSIZE) != 0) {
+            found = true;
+         }
       }
+
+      // Finding the byte with a 0
+      int posbyte = 0;
+      for(int i = 0; i < BLOCKSIZE && !posbyte; i++){
+         if(bufferMB[i]!=255){
+            posbyte=i;
+         }
+      }
+
+      // Finding the first bit with a 0
+      unsigned char mascara = 128; // 10000000
+      int posbit = 0;
+      while (bufferMB[posbyte] & mascara) {  
+         posbit++;
+         bufferMB[posbyte] <<= 1; // desplaz. de bits a la izqda
+      }
+
+      nbloque = ((posBloqueMB - SB.posPrimerBloqueMB) * BLOCKSIZE+ posbyte) * 8 + posbit;
+      escribir_bit(nbloque, 1);
+      SB.cantBloquesLibres--;
+      //y salvamos el superbloque
+      // ???
+      //Grabamos un buffer de 0s en la posición del nbloque del dispositivo por si había basura (podría tratarse de un bloque reutilizado por el sistema de ficheros)
+      // Tengo que mirar mas detalladamente como se hace esto
+      //Devolvemos el nº de bloque que hemos reservado, nbloque
+      return nbloque; 
    } else {
-
+      return -1; 
    }
-
-   return EXIT_SUCCESS;
 }
 
 int liberar_bloque(unsigned int nbloque){
