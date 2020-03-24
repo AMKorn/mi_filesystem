@@ -39,6 +39,7 @@ int initSB(unsigned int nbloques, unsigned int ninodos){
 
 //Hay que implementar Nivel 3 escribir_bit
 int initMB(){
+   if(bread(0, &SB) == EXIT_FAILURE) return EXIT_FAILURE;
    unsigned char buffer[BLOCKSIZE]; 
    memset(buffer, 0, BLOCKSIZE);
    int pos = SB.posPrimerBloqueMB;
@@ -51,6 +52,7 @@ int initMB(){
 
 int initAI(){
    struct inodo inodos[BLOCKSIZE/INODOSIZE];
+   bread(SB.posPrimerBloqueAI, inodos);
    int contInodos = SB.posPrimerInodoLibre+1;
    for(int i=SB.posPrimerBloqueAI; i<=SB.posUltimoBloqueAI; i++){
       for(int j=0; j<BLOCKSIZE/INODOSIZE; j++){
@@ -76,8 +78,10 @@ int initAI(){
   return EXIT_SUCCESS;
 }
 
+/*
 //Nivel 3
-int escribir_bit(unsigned int nbloque, unsigned int bit){
+int escribir_bit(unsigned int nbloque, unsigned int bit){ç
+   
    //unsigned int posMB = SB.posPrimerBloqueMB;
    unsigned int posbyte = nbloque/8;
    unsigned int posbit = nbloque%8;
@@ -182,4 +186,4 @@ int leer_inodo(unsigned int ninodo, struct inodo *inodo){
 
 int reservar_inodo(unsigned char tipo, unsigned char permisos){
    return EXIT_SUCCESS;
-}
+}*/

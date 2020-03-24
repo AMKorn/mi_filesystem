@@ -1,5 +1,6 @@
+make clean
 make
 ./mi_mkfs disco 100000
-ls -l disco
+./leer_sf disco > datos.txt
+cat datos.txt
 rm disco
-make clean

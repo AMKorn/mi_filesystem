@@ -1,4 +1,4 @@
-#include "bloques.c"
+#include "bloques.h"
 #include <time.h>
 #include <limits.h>
 

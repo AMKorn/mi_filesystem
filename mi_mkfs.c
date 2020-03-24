@@ -1,4 +1,4 @@
-#include "bloques.h"
+#include "ficheros_basico.h"
 
 #define DISCO argv[1]
 #define NUM_BLOQUES atoi(argv[2])
@@ -16,13 +16,9 @@ int main(int argc, char **argv){
     }
     unsigned char buf[BLOCKSIZE];   // We prepare space for the information
     memset(buf, 0, BLOCKSIZE);      // and start it full of zeros
-    for(unsigned int i=0; i<NUM_BLOQUES; i++){
-        if(bwrite(i, buf) == -1) {  // we write each block one by one
-            fprintf(stderr, "Error %d: %s\n", errno, strerror(errno));  // Error treatment
-            bumount();
-            return EXIT_FAILURE; 
-        }
-    }
-    bumount();  // last we close the disk
+    initSB(NUM_BLOQUES, NUM_BLOQUES/4);
+    initMB();
+    initAI();
+    bumount();  // lastly we close the disk
     return EXIT_SUCCESS;    // and exit the program
 }
