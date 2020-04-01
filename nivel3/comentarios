@@ -1,0 +1,4 @@
+1. He dejado posSB y tamSB en como #DEFINE en ficheros_basico.h, debido a que son constantes.
+2. initMB y initAi son copiados, así que hay que rehacerlos.
+3. Falta acabar de actualizar el leer_sf.c
+ 3.1 No he podido comprobar que funcione pero de momento parece funcionar.
