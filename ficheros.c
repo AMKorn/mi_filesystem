@@ -171,3 +171,41 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
     escribir_inodo(ninodo, inodo);
     return EXIT_SUCCESS;
  }
+
+ // Nivel 6
+
+ /**
+  * Trunca un fichero/directorio a los bytes indicados y liberando los bloques necesarios.
+  * */
+int mi_truncar_f(unsigned int ninodo, unsigned int nbytes){
+    //Comprobar que tiene permisos de escritura y que nbytes <= tamEnBytesLog
+    struct inodo inodo;
+    leer_inodo(ninodo, &inodo);
+    if((inodo.permisos & 2) != 2){
+        fprintf(stderr, "El inodo no tiene permisos de escritura.\n");
+        return -1;
+    }
+    if(inodo.tamEnBytesLog < nbytes){
+        fprintf(stderr, "No se puede truncar más allá del tamaño en bytes lógicos del fichero/directorio.\n");
+        return -1;
+    }
+
+    int primerBL;
+    if(nbytes%BLOCKSIZE == 0){
+        primerBL = nbytes/BLOCKSIZE;
+    } else {
+        primerBL = nbytes/BLOCKSIZE+1;
+    }
+
+    int bloquesLiberados = liberar_bloques_inodo(primerBL, &inodo);
+    if(bloquesLiberados==-1){
+        fprintf(stderr, "Error en liberar_bloques_inodo() desde mi_truncar_f().\n");
+        return -1;
+    }
+
+    inodo.mtime = time(NULL);
+    inodo.ctime = time(NULL);
+    inodo.tamEnBytesLog = nbytes;
+
+    return bloquesLiberados;
+}
