@@ -524,3 +524,79 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
    return ptr; //nbfisico
    //fprintf(stdout,"[traducir_bloque_inodo()→ inodo.punterosIndirectos[0] = 3140 (reservado BF 3140 para punteros_nivel1)]\n");
 }
+
+// Nivel 6
+/**
+ * Libera el nodo indicado por parámetro
+ * */
+int liberar_inodo(unsigned int ninodo){
+   return 0;
+}
+
+/**
+ * Libera todos los bloques ocupados a partir del bloque lógico indicado por parámetro primerBL.
+ * Devuelve la cantidad de bloques liberados.
+ * Actualmente es muy ineficiente, es necesario mejorarlo.
+ * */
+int liberar_bloques_inodo(unsigned int primerBL, struct inodo *inodo){
+   unsigned int liberados = 0; // Parámetro a devolver
+   unsigned int indice;
+   int bloques_punteros[3][NPUNTEROS];
+   int ptr_nivel[3];
+   int indices[3];
+
+
+   if(inodo->tamEnBytesLog==0) return 0;
+
+   int ultimoBL;
+   if(inodo->tamEnBytesLog % BLOCKSIZE == 0){
+      ultimoBL = inodo->tamEnBytesLog/BLOCKSIZE-1;
+   } else {
+      ultimoBL = inodo->tamEnBytesLog/BLOCKSIZE;
+   }
+
+   unsigned int ptr = 0;
+   for(int nBL = primerBL; nBL <= ultimoBL; nBL++){
+      unsigned int nRangoBL = obtener_nrangoBL(*inodo, nBL, &ptr);
+      if(nRangoBL<0) return -1;
+      unsigned int nivel_punteros=nRangoBL;
+
+      while(ptr>0 && nivel_punteros>0){
+         indice = obtener_indice(nBL, nivel_punteros);
+         if(indice == 0 || nBL == primerBL){
+            bread(ptr, bloques_punteros[nivel_punteros-1]);
+         }
+         ptr_nivel[nivel_punteros-1]=ptr;
+         indices[nivel_punteros-1]=indice;
+         ptr=bloques_punteros[nivel_punteros-1][indice];
+         nivel_punteros--;
+      }
+
+      if(ptr>0){
+         liberar_bloque(ptr);
+         liberados++;
+         if(nRangoBL==0){
+            inodo->punterosDirectos[nBL]=0;
+         } else {
+            while(nivel_punteros<nRangoBL){
+               indice=indices[nivel_punteros];
+               bloques_punteros[nivel_punteros][indice]=0;
+               ptr=ptr_nivel[nivel_punteros];
+               if(bloques_punteros[nivel_punteros]==0){
+                  liberar_bloque(ptr);
+                  liberados++;
+                  nivel_punteros++;
+                  if(nivel_punteros==nRangoBL){
+                     inodo->punterosIndirectos[nRangoBL-1]=0;
+                  }
+               } else {
+                  bwrite(ptr, bloques_punteros[nivel_punteros]);
+                  nivel_punteros = nRangoBL;
+               }
+            }
+         }
+      }
+   }
+
+   return liberados;
+}
