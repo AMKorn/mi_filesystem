@@ -53,8 +53,7 @@ struct inodo {                         // comprobar que ocupa 128 bytes haciendo
    1 indirecto simple, 1 indirecto doble, 1 indirecto triple */
 
    /* Utilizar una variable de alineación si es necesario para vuestra plataforma/compilador */
-   char
-       padding[INODOSIZE - 2 * sizeof(unsigned char) - 3 * sizeof(time_t) - 18 * sizeof(unsigned int) - 6 * sizeof(unsigned char)];
+   char padding[INODOSIZE - 2 * sizeof(unsigned char) - 3 * sizeof(time_t) - 18 * sizeof(unsigned int) - 6 * sizeof(unsigned char)];
    // Hay que restar también lo que ocupen las variables de alineación utilizadas!!!
 };
 

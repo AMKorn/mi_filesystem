@@ -525,12 +525,37 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
    //fprintf(stdout,"[traducir_bloque_inodo()→ inodo.punterosIndirectos[0] = 3140 (reservado BF 3140 para punteros_nivel1)]\n");
 }
 
+
 // Nivel 6
 /**
- * Libera el nodo indicado por parámetro
+ * Libera el nodo indicado por parámetro.
+ * Devuelve el número del inodo liberado.
  * */
 int liberar_inodo(unsigned int ninodo){
-   return 0;
+   struct inodo inodo;
+   if(leer_inodo(ninodo, &inodo)==EXIT_FAILURE) return -1;
+   int liberados = liberar_bloques_inodo(0, &inodo);
+   if(liberados == -1) return -1;
+   inodo.numBloquesOcupados -= liberados;
+   if(inodo.numBloquesOcupados != 0){
+      fprintf(stderr, "Error: liberar_bloques_inodo() no ha eliminado todos los bloques del inodo. \n");
+      return -1;
+   }
+   inodo.tipo = 'l';
+   inodo.tamEnBytesLog = 0;
+
+   //Actualizar lista enlazada
+   struct superbloque SB;
+   if(bread(posSB, &SB)==-1) return -1;
+   unsigned int primInLibre = SB.posPrimerInodoLibre;
+   inodo.punterosDirectos[0] = primInLibre;
+   SB.posPrimerInodoLibre = ninodo;
+   SB.cantInodosLibres++;
+
+   if(escribir_inodo(ninodo, inodo)==EXIT_FAILURE) return -1;
+   if(bwrite(posSB, &SB)==-1) return -1;
+
+   return ninodo;
 }
 
 /**
