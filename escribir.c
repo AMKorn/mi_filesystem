@@ -1,0 +1,78 @@
+#include "ficheros.h"
+int main(int argc, char **argv){
+    //Comprobamos la sintaxis
+    if(argc != 4){
+		fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <\"$(cat fichero)\"> <diferentes_inodos>\n");
+		return -1;
+ 	}
+
+    //Montamos el disco
+    if(bmount(argv[1])==-1) return EXIT_FAILURE;
+
+    //Inicializamos las variables
+    int tam = strlen(argv[3]);
+    char buffer[tam];
+    memset(buffer,0,tam);
+    strcpy(buffer,argv[3]);
+    int offsets[5]={9000,209000,30725000,409605000,480000000};
+    int escritos;
+    int ninodo;
+    if(ninodo==-1) return EXIT_FAILURE;
+    struct inodo ino;
+    struct stat st;
+    struct tm *ts;   //struct de la libreria <time.h>, nos sirve para guardar la hora        POSIBLE BORRAR
+    char atime[80];
+    char mtime[80];
+    char ctime[80];
+
+    //Iniciamos la escritura
+    printf("Offsets:")
+    for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
+        printf(" %d,",offsets[j]);
+    }
+    printf("\nLongitud texto: %d\n\n", tam);
+
+    //Un mismo inodo
+    if(atoi(argv[3])==0){
+        ninodo= reservar_inodo('f',6);
+    }
+    for(int i = 0; i<(sizeof(offsets)/sizeof(offsets[0])); i++){
+        //Si diferentes_inodo vale 1, reservaremos un nuevo inodo en cada iteracion
+        if(atoi(argv[3])==1){
+            ninodo= reservar_inodo('f',6);
+        }
+        escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
+        if(escritos==-1) {
+            fprintf(stderr,"Error durante la escritura.\n");
+            return EXIT_FAILURE;
+        }
+        if(mi_stat_f(ninodo, &st)== -1) {
+            fprintf(stderr,"Error en mi_stat_f.\n");
+            return EXIT_FAILURE;
+        }
+        ts = localtime(&stat.atime);
+        strftime(atime, sizeof(atime), "%a %Y-%m-%d %H:%M:%S", ts);
+        ts = localtime(&stat.mtime);
+        strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
+        ts = localtime(&stat.ctime);
+        strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
+
+        //Imprimimos resultados
+        fprintf(stderr,"Nº Inodo reservado: %d\n", ninodo);
+        fprintf(stderr,"Offset: %d\n", offsets[i]);
+        fprintf(stderr,"Bytes escritos: %d\n", escritos);
+        fprintf(stderr,"DATOS INODO %d:\n", ninodo);
+        fprintf(stderr,"tipo=%c\n", stat.tipo);
+        fprintf(stderr,"permisos=%d\n", stat.permisos);
+        fprintf(stderr,"atime: %s\n", atime);
+        fprintf(stderr,"mtime: %s\n", mtime);
+        fprintf(stderr,"ctime: %s\n", ctime);
+        fprintf(stderr,"nlinks=%d\n", stat.nlinks);
+        fprintf(stderr,"stat.tamBytesLogicos: %d\n", p_stat.tamEnBytesLog);
+        fprintf(stderr,"stat.numBloquesOcupados: %d\n\n\n", p_stat.numBloquesOcupados);
+    }
+    
+    //Desmontamos el disco
+    if(bumount(argv[1])==-1) return EXIT_FAILURE;
+
+}
