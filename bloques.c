@@ -4,9 +4,9 @@
 static int descriptor = 0;
 
 /**
- * Opens the file passed by parameter or creates it if necessary.
- * @param camino - string with the direction of the path to open.
- * @return the file descriptor of the opened file.
+ * Abre el archivo pasado por parámetro o lo crea si es necesario.
+ * @param camino - string con la dirección al camino que abrir
+ * @return el descriptor de fichero del fichero abierto.
  * */
 int bmount(const char *camino){
     umask(000);
@@ -18,18 +18,18 @@ int bmount(const char *camino){
 }
 
 /**
- * Closes the file.
- * @return 0 on success, -1 on failure.
+ * Cierra el fichero.
+ * @return 0 en éxito, -1 en error.
  * */
 int bumount(){
     return close(descriptor);
 }
 
 /**
- * Writes the content pointed to by buf in the specified block.
- * @param nbloque - the block number in which to write.
- * @param buf - the pointer of the information to write
- * @return the number of written bytes, or -1 if error.
+ * Escribe el contenido apuntado por buf en el bloque especificado.
+ * @param nbloque - el número de bloque en el que escribir
+ * @param buf - el puntero a la información a escribir
+ * @return el número de bytes escritos, o -1 si hay error.
  * */
 int bwrite(unsigned int nbloque, const void *buf){
     lseek(descriptor, nbloque*BLOCKSIZE, SEEK_SET);
@@ -37,10 +37,10 @@ int bwrite(unsigned int nbloque, const void *buf){
 }
 
 /**
- * Reads the content in the specified block and stores it in buf.
- * @param nbloque - the block number to read
- * @param buf - the pointer in which to store the information read.
- * @returns the number of read bytes, or -1 if error.
+ * Lee el contenido del bloque especificado y lo almacena en buf
+ * @param nbloque - el número del bloque a leer
+ * @param buf - el puntero a la dirección en la que almacenar la información leída
+ * @returns el número de bytes leídos, o -1 si hay error.
  * */
 int bread(unsigned int nbloque, void *buf){
     lseek(descriptor, nbloque*BLOCKSIZE, SEEK_SET);

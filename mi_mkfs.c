@@ -4,21 +4,21 @@
 #define NUM_BLOQUES atoi(argv[2])
 
 int main(int argc, char **argv){
-    if(!argv[1] || !argv[2] || argv[3]){    // If not enough arguments or too many,
+    if(argc!=3){                            // Si no hay el número adecuado de argumentos
         fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <nbloques>\n"); 
-                                            // an error is printed asking for the correct command format
-        return EXIT_FAILURE;                // and we finish the program
+                                            // se imprime un error que muestra el formato adecuado
+        return EXIT_FAILURE;                // y finalizamos el programa.
     }
 
-    if(!bmount(DISCO)){             // We start by mounting the disk.
-        fprintf(stderr, "Error %d: %s\n", errno, strerror(errno));  // if error, we print it
-        return EXIT_FAILURE;        // and exit the program.
+    if(!bmount(DISCO)){                     // Empezamos montando el disco.
+        fprintf(stderr, "Error %d: %s\n", errno, strerror(errno));  // Si hay un error, lo imprimimos
+        return EXIT_FAILURE;                // y salimos del programa.
     }
-    unsigned char buf[BLOCKSIZE];   // We prepare space for the information
-    memset(buf, 0, BLOCKSIZE);      // and start it full of zeros
+    unsigned char buf[BLOCKSIZE];           // Preparamos el espacio para la información
+    memset(buf, 0, BLOCKSIZE);              // y lo inicializamos a ceros.
     initSB(NUM_BLOQUES, NUM_BLOQUES/4);
     initMB();
     initAI();
-    bumount();  // lastly we close the disk
-    return EXIT_SUCCESS;    // and exit the program
+    bumount();                              // finalmente cerramos el disco
+    return EXIT_SUCCESS;                    // y salimos del programa
 }

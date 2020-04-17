@@ -1,8 +1,12 @@
 #include "ficheros.h"
 
-/*
-Escribe el contenido procedente de un buffer de memoria, buf_original, de tamaño nbytes, en un fichero/directorio
-*/
+/**
+ * Escribe el contenido procedente de un buffer de memoria, buf_original, de tamaño nbytes, en un fichero/directorio
+ * @param ninodo - el número del inodo en el que escribir
+ * @param buf_original - puntero que contiene la información a escribir
+ * @param nbytes - el tamaño de la información a escribir
+ * @return el número de bytes escritos, o -1 si hay un error.
+ * */
 int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offset, unsigned int nbytes){
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
@@ -144,8 +148,11 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
 }
 
 /**
- * Devuelve la metainformación de un fichero/directorio utilizando un struct STAT que contiene la meta información de los inodos.
-*/
+ * Devuelve la metainformación de un fichero/directorio utilizando un struct STAT.
+ * @param ninodo - El número del inodo cuya metainformación se quiere consultar.
+ * @param p_stat - Puntero al struct STAT en el que se almacena la metainformación.
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ * */
 int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
@@ -164,7 +171,10 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
 
 /**
  * Actualiza los permisos de un fichero/directorio.
- */
+ * @param ninodo - Número del inodo cuyos permisos se quieren modificar.
+ * @param permisos - Los permisos que se quieren establecer.
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ * */
  int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
@@ -180,6 +190,9 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
 
  /**
   * Trunca un fichero/directorio a los bytes indicados y liberando los bloques necesarios.
+  * @param ninodo - El número del inodo que se quiere truncar.
+  * @param nbytes - El número de bytes que se quieren trucar.
+  * @return el número de bloques liberados, o -1 si hay un error
   * */
 int mi_truncar_f(unsigned int ninodo, unsigned int nbytes){
     //Comprobar que tiene permisos de escritura y que nbytes <= tamEnBytesLog
