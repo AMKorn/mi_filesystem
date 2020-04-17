@@ -28,7 +28,7 @@ int main(int argc, char **argv){
     //if(ninodo==-1) return EXIT_FAILURE;
     //struct inodo ino;
     struct STAT st;
-    //struct tm *ts;   //struct de la libreria <time.h>, nos sirve para guardar la hora        POSIBLE BORRAR
+    /*struct tm *ts;   //struct de la libreria <time.h>, nos sirve para guardar la hora        POSIBLE BORRAR
     char atime[80];
     char mtime[80];
     char ctime[80];*/
