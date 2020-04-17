@@ -1,5 +1,6 @@
 #include "ficheros.h"
 #define TAM_LECTURA 1500
+
 int main(int argc, char **argv){
     //Comprobamos la sintaxis
     if (argc != 3) {

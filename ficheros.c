@@ -16,40 +16,45 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     unsigned int desp1 = offset % BLOCKSIZE;
     unsigned int desp2 = (offset + nbytes - 1)%BLOCKSIZE;
 
-    int bytes = 0;
+    int bytes = offset;
 
     // Preparación para la escritura de los bloques
     int nbloque = traducir_bloque_inodo(ninodo, primerBLogico, 1);
     if(nbloque == -1) return -1;
     unsigned char buf_bloque[BLOCKSIZE];
     bread(nbloque, buf_bloque);
+    fprintf(stdout, "desp1: %d\n", desp1);
 
     // Un único bloque
     if(primerBLogico == ultimoBLogico){
         memcpy(buf_bloque+desp1, buf_original, desp2-desp1+1);
-        return bwrite(nbloque, buf_bloque);
+        bwrite(nbloque, buf_bloque);
+
+        bytes += desp2-desp1+1;
+    } else {
+        // Primer bloque
+        memcpy(buf_bloque + desp1, buf_original, BLOCKSIZE - desp1);
+        bwrite(nbloque, buf_bloque);
+        bytes += BLOCKSIZE - desp1;
+        
+        // Bloques intermedios
+        for(int i = primerBLogico+1; i < ultimoBLogico; i++){
+            nbloque = traducir_bloque_inodo(ninodo, i, 1);
+            bytes += bwrite(nbloque, buf_original + (BLOCKSIZE - desp1) + (i - primerBLogico - 1) * BLOCKSIZE);
+        }
+
+        // Último bloque
+        nbloque = traducir_bloque_inodo(ninodo, ultimoBLogico, 1);
+        bread(nbloque, buf_bloque);
+        memcpy (buf_bloque, buf_original + (nbytes - desp2 - 1), desp2 + 1);
+        bwrite(nbloque, buf_bloque);
+        bytes += desp2+1;
     }
-
-    // Primer bloque
-    memcpy(buf_bloque + desp1, buf_original, BLOCKSIZE - desp1);
-    bytes += bwrite(nbloque, buf_bloque);
-    
-    // Bloques intermedios
-    for(int i = primerBLogico+1; i < ultimoBLogico; i++){
-        nbloque = traducir_bloque_inodo(ninodo, i, 1);
-        bytes += bwrite(nbloque, buf_original + (BLOCKSIZE - desp1) + (i - primerBLogico - 1) * BLOCKSIZE);
-    }
-
-    // Último bloque
-    nbloque = traducir_bloque_inodo(ninodo, ultimoBLogico, 1);
-    bread(nbloque, buf_bloque);
-    memcpy (buf_bloque, buf_original + (nbytes - desp2 - 1), desp2 + 1);
-    bytes += bwrite(nbloque, buf_bloque);
-
     // Actualización de metainformación
     leer_inodo(ninodo, &inodo);
     if(inodo.tamEnBytesLog < bytes) {
         inodo.tamEnBytesLog = bytes;
+        fprintf(stdout, "tamEnBytesLog desde mi_write_f: %d", inodo.tamEnBytesLog);
         inodo.ctime = time(NULL);
     }
     inodo.mtime = time(NULL);
@@ -84,7 +89,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
     unsigned int primerBLogico = offset/BLOCKSIZE;
     unsigned int ultimoBLogico = (offset + nbytes - 1)/BLOCKSIZE;
     unsigned int desp1 = offset % BLOCKSIZE;
-    unsigned int desp2 = (offset + nbytes - 1)/BLOCKSIZE;
+    unsigned int desp2 = (offset + nbytes - 1)%BLOCKSIZE;
     int nbloque;
     unsigned char buf_bloque[BLOCKSIZE];
     memset(buf_bloque, 0, BLOCKSIZE);

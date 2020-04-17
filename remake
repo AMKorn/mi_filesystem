@@ -1,0 +1,4 @@
+make clean
+make
+source script1e1.sh
+rm disco
