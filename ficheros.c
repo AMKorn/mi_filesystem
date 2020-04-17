@@ -14,7 +14,7 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     unsigned int primerBLogico = offset/BLOCKSIZE;
     unsigned int ultimoBLogico = (offset + nbytes - 1)/BLOCKSIZE;
     unsigned int desp1 = offset % BLOCKSIZE;
-    unsigned int desp2 = (offset + nbytes - 1)/BLOCKSIZE;
+    unsigned int desp2 = (offset + nbytes - 1)%BLOCKSIZE;
 
     int bytes = 0;
 
