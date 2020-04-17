@@ -55,6 +55,8 @@ dkms.conf
 disco
 mi_mkfs
 comentarios
-datos.txt
 limpiar
 trial
+*.sh 
+*.txt 
+remake
