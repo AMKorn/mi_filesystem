@@ -170,6 +170,28 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
 }
 
 /**
+ * Cambia los derechos de un fichero
+ * @param ninodo - El número del inodo cuya metainformación se quiere consultar.
+ * @param permisos - Nuevos permisos del fichero
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
+int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
+    //Comprobar que tiene permisos de escritura
+    struct inodo inodo;
+    leer_inodo(ninodo, &inodo);
+    if((inodo.permisos & 2) != 2){
+        fprintf(stderr, "El inodo no tiene permisos de escritura.\n");
+        return EXIT_FAILURE;
+    }
+
+    inodo.permisos = permisos;
+
+    inodo.mtime = time(NULL);
+    inodo.ctime = time(NULL);
+    return EXIT_SUCCESS;
+}
+
+/**
  * Actualiza los permisos de un fichero/directorio.
  * @param ninodo - Número del inodo cuyos permisos se quieren modificar.
  * @param permisos - Los permisos que se quieren establecer.
