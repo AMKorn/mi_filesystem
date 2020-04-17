@@ -1,0 +1,3 @@
+rm disco
+rm ext1.txt
+make clean

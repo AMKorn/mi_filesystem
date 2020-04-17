@@ -1,0 +1,10 @@
+clear//Ruben version
+make
+./mi_mkfs disco 100000
+./leer_sf disco > datos.txt
+cat datos.txt
+./escribir disco 123456789 0
+./leer disco 1 > ext1.txt
+rm ext1.txt
+rm disco
+make clean
