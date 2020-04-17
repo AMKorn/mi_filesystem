@@ -6,7 +6,7 @@
  * @param buf_original - puntero que contiene la información a escribir
  * @param nbytes - el tamaño de la información a escribir
  * @return el número de bytes escritos, o -1 si hay un error.
- * */
+ */
 int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offset, unsigned int nbytes){
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
@@ -66,11 +66,11 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     return bytes-offset;
 }
 
-/*
-Lee información de un fichero/directorio correspondiente al nº de inodo pasado como argumento y la almacena en un buffer de memoria.
-
-*** NO ESTÁ TERMINADO ***
-*/
+/**
+ * Lee información de un fichero/directorio correspondiente al nº de inodo pasado como argumento y la almacena en un buffer de memoria.
+ * 
+ * *** NO ESTÁ TERMINADO ***
+ */
 int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsigned int nbytes){
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
@@ -152,7 +152,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
  * @param ninodo - El número del inodo cuya metainformación se quiere consultar.
  * @param p_stat - Puntero al struct STAT en el que se almacena la metainformación.
  * @return EXIT_SUCCESS o EXIT_FAILURE
- * */
+ */
 int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
@@ -174,7 +174,7 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
  * @param ninodo - Número del inodo cuyos permisos se quieren modificar.
  * @param permisos - Los permisos que se quieren establecer.
  * @return EXIT_SUCCESS o EXIT_FAILURE
- * */
+ */
  int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
