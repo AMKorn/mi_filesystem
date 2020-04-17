@@ -1,9 +1,17 @@
 #include "ficheros.h"
-
+#include<stdio.h>
 int main(int argc, char **argv){
+
+    int offsets[5]={9000,209000,30725000,409605000,480000000};
+
     //Comprobamos la sintaxis
     if(argc != 4){
 		fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <\"$(cat fichero)\"> <diferentes_inodos>\n");
+        fprintf(stderr,"Offsets:");
+        for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
+            fprintf(stderr," %d,",offsets[j]);
+        }
+        fprintf(stderr,"\nSi diferentes_inodos=0 se reserva un solo inodo para todos los offsets\n");
 		return -1;
  	}
 
@@ -14,13 +22,13 @@ int main(int argc, char **argv){
     int tam = strlen(argv[2]);
     char buffer[tam];
     memset(buffer,0,tam);
-    strcpy(buffer,argv[2]);
-    int offsets[5]={9000,209000,30725000,409605000,480000000};
+    strcpy(buffer,argv[3]);
     int escritos;
     int ninodo;
+    //if(ninodo==-1) return EXIT_FAILURE;
     //struct inodo ino;
     struct STAT st;
-    /*struct tm *ts;   //struct de la libreria <time.h>, nos sirve para guardar la hora        POSIBLE BORRAR
+    //struct tm *ts;   //struct de la libreria <time.h>, nos sirve para guardar la hora        POSIBLE BORRAR
     char atime[80];
     char mtime[80];
     char ctime[80];*/
@@ -42,17 +50,18 @@ int main(int argc, char **argv){
         if(atoi(argv[3])==1){
             ninodo= reservar_inodo('f',6);
         }
+        fprintf(stderr,"ANTES DE ESCRIBIR\n");
         escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
         if(escritos==-1) {
             fprintf(stderr,"Error durante la escritura.\n");
             return EXIT_FAILURE;
         }
+        fprintf(stderr,"DESPUES DE ESCRIBIR\n");
         if(mi_stat_f(ninodo, &st)== -1) {
             fprintf(stderr,"Error en mi_stat_f.\n");
             return EXIT_FAILURE;
         }
-        fflush(stdout);/*
-        ts = localtime(&st.atime);
+        /*ts = localtime(&st.atime);
         strftime(atime, sizeof(atime), "%a %Y-%m-%d %H:%M:%S", ts);
         ts = localtime(&st.mtime);
         strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
@@ -63,7 +72,7 @@ int main(int argc, char **argv){
         fprintf(stderr,"Nº Inodo reservado: %d\n", ninodo);
         fprintf(stderr,"Offset: %d\n", offsets[i]);
         fprintf(stderr,"Bytes escritos: %d\n", escritos);
-        fprintf(stderr,"\nDATOS INODO %d:\n ...\n", ninodo);
+        fprintf(stderr,"\nDATOS INODO %d:\n...\n", ninodo);
         /*fprintf(stderr,"tipo=%c\n", st.tipo);
         fprintf(stderr,"permisos=%d\n", st.permisos);
         fprintf(stderr,"atime: %s\n", atime);
