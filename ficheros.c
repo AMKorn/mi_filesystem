@@ -54,13 +54,12 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     leer_inodo(ninodo, &inodo);
     if(inodo.tamEnBytesLog < bytes) {
         inodo.tamEnBytesLog = bytes;
-        fprintf(stdout, "tamEnBytesLog desde mi_write_f: %d", inodo.tamEnBytesLog);
         inodo.ctime = time(NULL);
     }
     inodo.mtime = time(NULL);
     escribir_inodo(ninodo, inodo);
 
-    return bytes;
+    return bytes-offset;
 }
 
 /*

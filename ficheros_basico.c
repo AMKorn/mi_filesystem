@@ -331,10 +331,10 @@ int leer_inodo(unsigned int ninodo, struct inodo *inodo){
 }
 
 
-/*
-Encuentra el primer inodo libre (dato almacenado en el superbloque), lo reserva (con la ayuda de la función escribir_inodo()), 
-devuelve su número y actualiza la lista enlazada de inodos libres.
-*/
+/**
+* Encuentra el primer inodo libre (dato almacenado en el superbloque), lo reserva (con la ayuda de la función escribir_inodo()), 
+* devuelve su número y actualiza la lista enlazada de inodos libres.
+**/
 int reservar_inodo(unsigned char tipo, unsigned char permisos){
    struct superbloque SB;
    //Comprobamos si hay algun error en la lectura

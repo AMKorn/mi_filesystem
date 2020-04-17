@@ -50,13 +50,11 @@ int main(int argc, char **argv){
         if(atoi(argv[3])==1){
             ninodo= reservar_inodo('f',6);
         }
-        fprintf(stderr,"ANTES DE ESCRIBIR\n");
         escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
         if(escritos==-1) {
             fprintf(stderr,"Error durante la escritura.\n");
             return EXIT_FAILURE;
         }
-        fprintf(stderr,"DESPUES DE ESCRIBIR\n");
         if(mi_stat_f(ninodo, &st)== -1) {
             fprintf(stderr,"Error en mi_stat_f.\n");
             return EXIT_FAILURE;
