@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv){
     //Comprobamos la sintaxis
-    if (argc != 3) {
+    if (argc != 4) {
 		fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <ninodo> <permisos>\n"); 
         return EXIT_FAILURE;
     }

@@ -25,8 +25,6 @@ int main(int argc, char **argv){
     strcpy(buffer,argv[3]);
     int escritos;
     int ninodo;
-    //if(ninodo==-1) return EXIT_FAILURE;
-    //struct inodo ino;
     struct STAT st;
     /*struct tm *ts;   //struct de la libreria <time.h>, nos sirve para guardar la hora        POSIBLE BORRAR
     char atime[80];
