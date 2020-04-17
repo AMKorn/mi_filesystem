@@ -68,8 +68,6 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
 
 /**
  * Lee información de un fichero/directorio correspondiente al nº de inodo pasado como argumento y la almacena en un buffer de memoria.
- * 
- * *** NO ESTÁ TERMINADO ***
  */
 int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsigned int nbytes){
     struct inodo inodo;
@@ -82,6 +80,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
 
     if(offset >= inodo.tamEnBytesLog){
         leidos = 0;
+        //fprintf(stderr, "offset >= inodo.tamEnBytesLog\n");
         return leidos;
     }
 
@@ -98,13 +97,11 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
     memset(buf_bloque, 0, BLOCKSIZE);
 
     // Preparación para la escritura de los bloques
+    //fprintf(stderr, "TADRUCIENDO BLOQUE:\nbloque: %d \nninodo: %d \nprimerBLogico: %d \n",nbloque, ninodo, primerBLogico);
     nbloque = traducir_bloque_inodo(ninodo,primerBLogico,0);
     if(nbloque == -1){									
-        /*
-        Tened en cuenta que las llamadas a traducir_bloque_inodo() ahora serán con reservar=0 y que pueden devolver -1 si 
-        el bloque físico no existe. En tal caso NO hay que hacer el bread() del bloque físico ni por tanto hacer un memcpy, 
-        simplemente hay que saltar ese bloque pero acumulando en bytes leídos lo que ocupa ese bloque atravesado, y seguir iterando. 
-        */
+
+        leidos = nbytes;
         return leidos;
     }
     if(bread(nbloque, buf_bloque)== -1) return -1;
@@ -115,6 +112,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
         memcpy(buf_original,buf_bloque + desp1, nbytes);
         // Actualizamos la variable que controla el número de bytes escritos.
         leidos = nbytes;
+        //fprintf(stderr, "P2: %d\n",leidos);
         return leidos;      //[Ruben]: si retornas ahora no actualizaras los inodo.times, creo
     }
 
@@ -126,7 +124,10 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
     // Bloques intermedios
     for(int i = primerBLogico+1; i < ultimoBLogico; i++){
         nbloque = traducir_bloque_inodo(ninodo, i, 0);
-        if(nbloque==-1) return leidos;
+        if(nbloque==-1){ 
+            //fprintf(stderr, "P3: %d\n",leidos);
+            return leidos;
+        }
         if(bread(nbloque, buf_bloque)== -1) return -1;
         memcpy(buf_original, buf_bloque + desp1, BLOCKSIZE - desp1);
         leidos += BLOCKSIZE;
@@ -144,6 +145,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
     inodo.atime = time(NULL);
     if(escribir_inodo(ninodo, inodo) < 0) return -1;
 
+    //fprintf(stderr, "P4: %d\n",leidos);    
     return leidos;
 }
 
