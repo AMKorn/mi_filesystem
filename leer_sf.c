@@ -105,6 +105,7 @@ int main(int argc, char **argv){
     printf("tamEnBytesLog: %d\n", ino.tamEnBytesLog);
     printf("numBloquesOcupados: %d\n", ino.numBloquesOcupados);
     */
+	/*
     printf("INODO 1. TRADUCCION DE LOS BLOQUES LOGICOS 8, 204, 30.004, 400.004 y 468.750\n");
     int i = reservar_inodo('f',6);
     traducir_bloque_inodo(i,8,1);
@@ -137,7 +138,7 @@ int main(int argc, char **argv){
         return -1;
     }
     printf("SB.posPrimerInodoLibre = %d\n",SB.posPrimerInodoLibre);
-
+*/
 
 	bumount();
     return EXIT_SUCCESS;
