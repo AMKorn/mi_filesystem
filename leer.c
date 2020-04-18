@@ -1,3 +1,4 @@
+
 #include "ficheros.h"
 #define TAM_LECTURA 1500
 int main(int argc, char **argv){
@@ -21,6 +22,14 @@ int main(int argc, char **argv){
     int leidos = 0;
     int total = 0;
 
+    //Comprobamos los permisos
+    /*
+    if((ino.permisos & 4) != 4) { 
+        fprintf(stderr, "\nNo tiene permiso de lectura\n"); 
+        fprintf(stderr,"\n\nTotal_leidos: %d" , total);
+        fprintf(stderr,"\nTamEnBytesLog: %d \n" , ino.tamEnBytesLog);	
+        return EXIT_SUCCESS; 
+    }*/
 
     //Iniciamos la lectura
     leidos = mi_read_f(atoi(argv[2]), buff_texto,offset, TAM_LECTURA);
