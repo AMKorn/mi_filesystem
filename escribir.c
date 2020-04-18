@@ -9,11 +9,11 @@ int main(int argc, char **argv){
     //Comprobamos la sintaxis
     if(argc != 4){
 		fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <\"$(cat fichero)\"> <diferentes_inodos>\n");
-        fprintf(stderr,"Offsets:");
+        fprintf(stdout,"Offsets:");
         for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
-            fprintf(stderr," %d,",offsets[j]);
+            fprintf(stdout," %d,",offsets[j]);
         }
-        fprintf(stderr,"\nSi diferentes_inodos=0 se reserva un solo inodo para todos los offsets\n");
+        fprintf(stdout,"\nSi diferentes_inodos=0 se reserva un solo inodo para todos los offsets\n");
 		return -1;
  	}
 
@@ -67,18 +67,18 @@ int main(int argc, char **argv){
         strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);*/
 
         //Imprimimos resultados
-        fprintf(stderr,"Nº Inodo reservado: %d\n", ninodo);
-        fprintf(stderr,"Offset: %d\n", offsets[i]);
-        fprintf(stderr,"Bytes escritos: %d\n", escritos);
-        fprintf(stderr,"\nDATOS INODO %d:\n...\n", ninodo);
-        /*fprintf(stderr,"tipo=%c\n", st.tipo);
-        fprintf(stderr,"permisos=%d\n", st.permisos);
-        fprintf(stderr,"atime: %s\n", atime);
-        fprintf(stderr,"mtime: %s\n", mtime);
-        fprintf(stderr,"ctime: %s\n", ctime);
-        fprintf(stderr,"nlinks=%d\n", st.nlinks);*/
-        fprintf(stderr,"stat.tamBytesLogicos: %d\n", st.tamEnBytesLog);
-        fprintf(stderr,"stat.numBloquesOcupados: %d\n\n\n", st.numBloquesOcupados);
+        fprintf(stdout,"Nº Inodo reservado: %d\n\n", ninodo);
+        fprintf(stdout,"Offset: %d\n", offsets[i]);
+        fprintf(stdout,"Bytes escritos: %d\n", escritos);
+        fprintf(stdout,"\nDATOS INODO %d:\n...\n", ninodo);
+        /*fprintf(stdout,"tipo=%c\n", st.tipo);
+        fprintf(stdout,"permisos=%d\n", st.permisos);
+        fprintf(stdout,"atime: %s\n", atime);
+        fprintf(stdout,"mtime: %s\n", mtime);
+        fprintf(stdout,"ctime: %s\n", ctime);
+        fprintf(stdout,"nlinks=%d\n", st.nlinks);*/
+        fprintf(stdout,"stat.tamBytesLogicos: %d\n", st.tamEnBytesLog);
+        fprintf(stdout,"stat.numBloquesOcupados: %d\n\n\n", st.numBloquesOcupados);
     }
     
     //Desmontamos el disco

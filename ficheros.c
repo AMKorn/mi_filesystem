@@ -249,6 +249,16 @@ int mi_truncar_f(unsigned int ninodo, unsigned int nbytes){
     inodo.mtime = time(NULL);
     inodo.ctime = time(NULL);
     inodo.tamEnBytesLog = nbytes;
+    inodo.numBloquesOcupados -= bloquesLiberados;
+    
+    escribir_inodo(ninodo, inodo);
+
+    printf("DATOS INODO %d:\n", ninodo);
+    printf("tipo=%c\n", inodo.tipo);
+    printf("...\n");
+    printf("tamEnBytesLog=%d\n", inodo.tamEnBytesLog);
+    printf("numBloquesOcupados=%d\n", inodo.numBloquesOcupados);
+
 
     return bloquesLiberados;
 }
