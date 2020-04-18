@@ -1,6 +1,5 @@
 #include "ficheros.h"
 #define TAM_LECTURA 1500
-
 int main(int argc, char **argv){
     //Comprobamos la sintaxis
     if (argc != 3) {
@@ -12,12 +11,16 @@ int main(int argc, char **argv){
 
     //Inicializamos variables
     struct inodo ino;
-    if(leer_inodo(atoi(argv[2]), &ino)==-1)return EXIT_FAILURE;
+    if(leer_inodo(atoi(argv[2]), &ino)==-1){
+        fprintf(stderr,"ERROR al leer el inodo");
+        return EXIT_FAILURE;
+    }
     unsigned char buff_texto[TAM_LECTURA];
     memset(buff_texto, 0, TAM_LECTURA);
     int offset = 0;
     int leidos = 0;
     int total = 0;
+
 
     //Iniciamos la lectura
     leidos = mi_read_f(atoi(argv[2]), buff_texto,offset, TAM_LECTURA);
