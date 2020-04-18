@@ -1,5 +1,7 @@
 #include "ficheros.h"
 #include<stdio.h>
+
+
 int main(int argc, char **argv){
 
     int offsets[5]={9000,209000,30725000,409605000,480000000};
@@ -82,4 +84,5 @@ int main(int argc, char **argv){
     //Desmontamos el disco
     if(bumount(argv[1])==-1) return EXIT_FAILURE;
 
+    return EXIT_SUCCESS;
 }

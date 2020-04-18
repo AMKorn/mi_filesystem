@@ -180,7 +180,9 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
 int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
     //Comprobar que tiene permisos de escritura
     struct inodo inodo;
-    leer_inodo(ninodo, &inodo);
+    if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
+        return EXIT_FAILURE;
+    }
     if((inodo.permisos & 2) != 2){
         fprintf(stderr, "El inodo no tiene permisos de escritura.\n");
         return EXIT_FAILURE;
@@ -198,7 +200,7 @@ int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
  * @param ninodo - Número del inodo cuyos permisos se quieren modificar.
  * @param permisos - Los permisos que se quieren establecer.
  * @return EXIT_SUCCESS o EXIT_FAILURE
- */
+ *//*
  int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
@@ -208,7 +210,7 @@ int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
     inodo.ctime = time(NULL);
     escribir_inodo(ninodo, inodo);
     return EXIT_SUCCESS;
- }
+ }*/
 
  // Nivel 6
 
