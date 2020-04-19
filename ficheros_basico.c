@@ -486,7 +486,6 @@ int obtener_indice(unsigned int nblogico, unsigned int nivel_punteros){
  *     Si no existe bloque físico de datos, lo reservará y se devolverá su posición
  */
 int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reservar){
-   
    struct inodo inodo;
    unsigned int ptr, ptr_ant, salvar_inodo, nRangoBL, nivel_punteros, indice;
    int buffer[NPUNTEROS];
@@ -541,7 +540,7 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
 
          }else {
             buffer[indice] = ptr; 
-			   fprintf(stdout,"[traducir_bloque_inodo()→ punteros_nivel%d [%d] = %d (reservado BF %d para punteros_nivel%d)]\n",(nivel_punteros+1),indice,ptr,ptr,nivel_punteros);
+			   fprintf(stdout,"[traducir_bloque_inodo()→ punteros_nivel%d [%d] = %d (reservado BF %d para BL %u)]\n",(nivel_punteros+1),indice,ptr,ptr,nblogico);
             bwrite(ptr_ant, buffer);
          }
       }
