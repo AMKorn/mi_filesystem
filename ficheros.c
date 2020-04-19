@@ -11,7 +11,7 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
     if((inodo.permisos & 2) != 2){
-        fprintf(stderr, "El inodo no tiene permisos de escritura.\n");
+        fprintf(stderr, "El inodo no tiene permisos de escritura. Permisos: %d\n", inodo.permisos);
         return -1;
     }
 
@@ -22,36 +22,53 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
 
     int bytes = offset;
 
-    // Preparación para la escritura de los bloques
+    // Preparación1 para la escritura de los bloques
     int nbloque = traducir_bloque_inodo(ninodo, primerBLogico, 1);
     if(nbloque == -1) return -1;
     unsigned char buf_bloque[BLOCKSIZE];
-    bread(nbloque, buf_bloque);
-    fprintf(stdout, "desp1: %d\n", desp1);
+    if(bread(nbloque, buf_bloque) == -1){
+        fprintf(stderr, "mi_write_f(): Error de lectura de bloque.\n");
+        return -1;
+    }
 
     // Un único bloque
     if(primerBLogico == ultimoBLogico){
         memcpy(buf_bloque+desp1, buf_original, desp2-desp1+1);
-        bwrite(nbloque, buf_bloque);
-
+        if(bwrite(nbloque, buf_bloque) == -1){
+            fprintf(stderr, "mi_write_f(): Error de escritura de bloque. Único bloque.\n");
+            return -1;
+        }
         bytes += desp2-desp1+1;
     } else {
         // Primer bloque
         memcpy(buf_bloque + desp1, buf_original, BLOCKSIZE - desp1);
-        bwrite(nbloque, buf_bloque);
+        if(bwrite(nbloque, buf_bloque) == -1){
+            fprintf(stderr, "mi_write_f(): Error de escritura de bloque. Primer bloque.\n");
+            return -1;
+        }
         bytes += BLOCKSIZE - desp1;
         
         // Bloques intermedios
         for(int i = primerBLogico+1; i < ultimoBLogico; i++){
             nbloque = traducir_bloque_inodo(ninodo, i, 1);
-            bytes += bwrite(nbloque, buf_original + (BLOCKSIZE - desp1) + (i - primerBLogico - 1) * BLOCKSIZE);
+            if(bwrite(nbloque, buf_original + (BLOCKSIZE - desp1) + (i - primerBLogico - 1) * BLOCKSIZE) == -1){
+                fprintf(stderr, "mi_write_f(): Error de escritura de bloque. Bloques intermedios.\n");
+                return -1;
+            }
+            bytes += BLOCKSIZE;
         }
 
         // Último bloque
         nbloque = traducir_bloque_inodo(ninodo, ultimoBLogico, 1);
-        bread(nbloque, buf_bloque);
+        if(bread(nbloque, buf_bloque) == -1){
+            fprintf(stderr, "mi_write_f(): Error de lectura del último bloque.\n");
+            return -1;
+        }
         memcpy (buf_bloque, buf_original + (nbytes - desp2 - 1), desp2 + 1);
-        bwrite(nbloque, buf_bloque);
+        if(bwrite(nbloque, buf_bloque) == -1){
+            fprintf(stderr, "mi_write_f(): Error de escritura de bloque. Último bloque.\n");
+            return -1;
+        }        
         bytes += desp2+1;
     }
     // Actualización de metainformación
@@ -63,7 +80,7 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     inodo.mtime = time(NULL);
     escribir_inodo(ninodo, inodo);
 
-    return bytes-offset;
+    return bytes - offset;
 }
 
 /**
@@ -183,15 +200,21 @@ int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
     if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
         return EXIT_FAILURE;
     }
+
+    /*
     if((inodo.permisos & 2) != 2){
         fprintf(stderr, "El inodo no tiene permisos de escritura.\n");
         return EXIT_FAILURE;
-    }
+    }*/
 
     inodo.permisos = permisos;
 
-    inodo.mtime = time(NULL);
     inodo.ctime = time(NULL);
+
+    if(escribir_inodo(ninodo, inodo) == EXIT_FAILURE) {
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
 

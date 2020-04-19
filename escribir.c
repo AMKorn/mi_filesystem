@@ -16,7 +16,10 @@ int main(int argc, char **argv){
  	}
 
     //Montamos el disco
-    if(bmount(argv[1])==-1) return EXIT_FAILURE;
+    if(bmount(argv[1])==-1) {
+        fprintf(stderr, "Error de montaje de disco.\n");
+        return EXIT_FAILURE;
+    }
 
     //Inicializamos las variables
     int tam = strlen(argv[2]);
@@ -47,7 +50,7 @@ int main(int argc, char **argv){
     for(int i = 0; i<(sizeof(offsets)/sizeof(offsets[0])); i++){
         //Si diferentes_inodo vale 1, reservaremos un nuevo inodo en cada iteracion
         if(atoi(argv[3])==1){
-            ninodo= reservar_inodo('f',6);
+            ninodo = reservar_inodo('f',6);
         }
         escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
         if(escritos==-1) {
@@ -70,19 +73,20 @@ int main(int argc, char **argv){
         fprintf(stderr,"Offset: %d\n", offsets[i]);
         fprintf(stderr,"Bytes escritos: %d\n", escritos);
         fprintf(stderr,"DATOS INODO %d:\n...\n", ninodo);
-        /*
-	fprintf(stderr,"Tipo=%c\n", st.tipo);
+	    fprintf(stderr,"Tipo=%c\n", st.tipo);
         fprintf(stderr,"Permisos=%d\n", st.permisos);
         fprintf(stderr,"Atime: %s\n", atime);
         fprintf(stderr,"Mtime: %s\n", mtime);
         fprintf(stderr,"Ctime: %s\n", ctime);
         fprintf(stderr,"nlinks=%d\n", st.nlinks);
-	*/
         fprintf(stderr,"TamBytesLogicos: %d\n", st.tamEnBytesLog);
         fprintf(stderr,"NumBloquesOcupados: %d\n\n\n", st.numBloquesOcupados);
     }
     
     //Desmontamos el disco
-    if(bumount(argv[1])==-1) return EXIT_FAILURE;
+    if(bumount(argv[1])==-1) {
+        fprintf(stderr, "Error al desmontar el disco.\n");
+        return EXIT_FAILURE;
+    }
 
 }
