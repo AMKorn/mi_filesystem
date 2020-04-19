@@ -291,9 +291,9 @@ int liberar_bloque(unsigned int nbloque){
    }
 
    //Incrementamos los bloques libres
-   printf("bloques libres = %d\n", SB.cantBloquesLibres);
+   //printf("bloques libres = %d\n", SB.cantBloquesLibres);
    SB.cantBloquesLibres++;
-   printf("bloques libres = %d\n", SB.cantBloquesLibres);
+   //printf("bloques libres = %d\n", SB.cantBloquesLibres);
    if(bwrite(posSB,&SB)<0){
 		return -1;
    }
@@ -649,7 +649,7 @@ int liberar_bloques_inodo(unsigned int primerBL, struct inodo *inodo){
                bloques_punteros[nivel_punteros][indice]=0;
                ptr=ptr_nivel[nivel_punteros];
                if(memcmp(bloques_punteros[nivel_punteros], buffVacio, BLOCKSIZE)==0){
-                  printf("[liberar_bloques_inodo()→ liberamos BF %d: bloque de punteros de nivel %d].\n", ptr, nivel_punteros+1);
+                  printf("[liberar_bloques_inodo()→ liberamos BF %d: bloque de punteros_nivel%d de indirectos%d].\n", ptr, nivel_punteros+1, 1);
                   liberar_bloque(ptr);
                   liberados++;
                   nivel_punteros++;

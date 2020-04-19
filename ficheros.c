@@ -222,31 +222,14 @@ int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
     return EXIT_SUCCESS;
 }
 
-/**
- * Actualiza los permisos de un fichero/directorio.
- * @param ninodo - Número del inodo cuyos permisos se quieren modificar.
- * @param permisos - Los permisos que se quieren establecer.
- * @return EXIT_SUCCESS o EXIT_FAILURE
- *//*
- int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
-    struct inodo inodo;
-    if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
-        return EXIT_FAILURE;
-    }
-    inodo.permisos = permisos;
-    inodo.ctime = time(NULL);
-    escribir_inodo(ninodo, inodo);
-    return EXIT_SUCCESS;
- }*/
-
  // Nivel 6
 
- /**
-  * Trunca un fichero/directorio a los bytes indicados y liberando los bloques necesarios.
-  * @param ninodo - El número del inodo que se quiere truncar.
-  * @param nbytes - El número de bytes que se quieren trucar.
-  * @return el número de bloques liberados, o -1 si hay un error
-  * */
+/**
+ * Trunca un fichero/directorio a los bytes indicados y liberando los bloques necesarios.
+ * @param ninodo - El número del inodo que se quiere truncar.
+ * @param nbytes - El número de bytes que se quieren trucar.
+ * @return el número de bloques liberados, o -1 si hay un error
+ */
 int mi_truncar_f(unsigned int ninodo, unsigned int nbytes){
     //Comprobar que tiene permisos de escritura y que nbytes <= tamEnBytesLog
     struct inodo inodo;
