@@ -1,6 +1,7 @@
-
 #include "ficheros.h"
+
 #define TAM_LECTURA 1500
+
 int main(int argc, char **argv){
     //Comprobamos la sintaxis
     if (argc != 3) {
@@ -11,11 +12,12 @@ int main(int argc, char **argv){
     if(bmount(argv[1])==-1) return EXIT_FAILURE;
 
     //Inicializamos variables
-    struct inodo ino;
-    if(leer_inodo(atoi(argv[2]), &ino)==-1){
+    struct STAT stat;
+    unsigned int ninodo = atoi(argv[2]);
+    /*if(ninodo, &stat)==-1){
         fprintf(stderr,"ERROR al leer el inodo");
         return EXIT_FAILURE;
-    }
+    }*/
     unsigned char buff_texto[TAM_LECTURA];
     memset(buff_texto, 0, TAM_LECTURA);
     int offset = 0;
@@ -23,30 +25,31 @@ int main(int argc, char **argv){
     int total = 0;
 
     //Comprobamos los permisos
-    /*
-    if((ino.permisos & 4) != 4) { 
-        fprintf(stderr, "\nNo tiene permiso de lectura\n"); 
-        fprintf(stderr,"\n\nTotal_leidos: %d" , total);
-        fprintf(stderr,"\nTamEnBytesLog: %d \n" , ino.tamEnBytesLog);	
-        return EXIT_SUCCESS; 
-    }*/
+    /**
+     * if((ino.permisos & 4) != 4) { 
+     *   fprintf(stderr, "\nNo tiene permiso de lectura\n"); 
+     *   fprintf(stderr,"\n\nTotal_leidos: %d" , total);
+     *   fprintf(stderr,"\nTamEnBytesLog: %d \n" , ino.tamEnBytesLog);	
+     *   return EXIT_SUCCESS; 
+     * }
+    */
 
     //Iniciamos la lectura
-    leidos = mi_read_f(atoi(argv[2]), buff_texto,offset, TAM_LECTURA);
-    if(leidos == -1) return -1;
+    leidos = mi_read_f(ninodo, buff_texto,offset, TAM_LECTURA);
+    //if(leidos == -1) return -1;
     while (leidos>0){
         write(1,buff_texto,leidos);
-        memset(buff_texto, 0, TAM_LECTURA);
-        offset += TAM_LECTURA;
         total += leidos;
+        offset += TAM_LECTURA;
+        memset(buff_texto, 0, TAM_LECTURA);
+        leidos = mi_read_f(ninodo, buff_texto,offset, TAM_LECTURA);
         
-        leidos = mi_read_f(atoi(argv[2]), buff_texto,offset, TAM_LECTURA);
-        if(leidos == -1) return -1;
+        //if(leidos == -1) return -1;
     }
-
+    mi_stat_f(ninodo, &stat);
     //Imprimimos los resultados
-    fprintf(stderr, "\n Total_leidos: %d", total);
-    fprintf(stderr, "\n TamEnBytesLog: %d \n", ino.tamEnBytesLog);
+    fprintf(stderr, "\nTotal_leidos: %d", total);
+    fprintf(stderr, "\nTamEnBytesLog: %d \n", stat.tamEnBytesLog);
 
     //Desmontamos el disco
     if(bumount(argv[1])==-1) return EXIT_FAILURE;

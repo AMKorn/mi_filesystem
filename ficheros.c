@@ -89,16 +89,13 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
 int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsigned int nbytes){
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
-    int leidos = 0;
     if((inodo.permisos & 4) != 4){
         fprintf(stderr, "El inodo no tiene permisos de lectura.\n");
         return -1;
     }
 
     if(offset >= inodo.tamEnBytesLog){
-        leidos = 0;
-        //fprintf(stderr, "offset >= inodo.tamEnBytesLog\n");
-        return leidos;
+        return 0;
     }
 
     if(offset + nbytes >= inodo.tamEnBytesLog){
@@ -109,19 +106,17 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
     unsigned int ultimoBLogico = (offset + nbytes - 1)/BLOCKSIZE;
     unsigned int desp1 = offset % BLOCKSIZE;
     unsigned int desp2 = (offset + nbytes - 1)%BLOCKSIZE;
-    int nbloque;
+    
+    int leidos = 0, nbfisico;
     unsigned char buf_bloque[BLOCKSIZE];
-    memset(buf_bloque, 0, BLOCKSIZE);
+    nbfisico = traducir_bloque_inodo(ninodo, primerBLogico, 0);
+    bread(nbfisico, buf_bloque);
 
     // Preparación para la escritura de los bloques
-    //fprintf(stderr, "TADRUCIENDO BLOQUE:\nbloque: %d \nninodo: %d \nprimerBLogico: %d \n",nbloque, ninodo, primerBLogico);
-    nbloque = traducir_bloque_inodo(ninodo,primerBLogico,0);
-    if(nbloque == -1){									
-
-        leidos = nbytes;
-        return leidos;
+    if(nbfisico == -1){
+        return nbytes;
     }
-    if(bread(nbloque, buf_bloque)== -1) return -1;
+    if(bread(nbfisico, buf_bloque) == -1) return -1;
 
 
     // Un único bloque
@@ -129,7 +124,6 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
         memcpy(buf_original,buf_bloque + desp1, nbytes);
         // Actualizamos la variable que controla el número de bytes escritos.
         leidos = nbytes;
-        //fprintf(stderr, "P2: %d\n",leidos);
         return leidos;      //[Ruben]: si retornas ahora no actualizaras los inodo.times, creo
     }
 
@@ -140,20 +134,20 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
     
     // Bloques intermedios
     for(int i = primerBLogico+1; i < ultimoBLogico; i++){
-        nbloque = traducir_bloque_inodo(ninodo, i, 0);
-        if(nbloque==-1){ 
+        nbfisico = traducir_bloque_inodo(ninodo, i, 0);
+        if(nbfisico != -1){ 
             //fprintf(stderr, "P3: %d\n",leidos);
             return leidos;
         }
-        if(bread(nbloque, buf_bloque)== -1) return -1;
+        if(bread(nbfisico, buf_bloque)== -1) return -1;
         memcpy(buf_original, buf_bloque + desp1, BLOCKSIZE - desp1);
         leidos += BLOCKSIZE;
     }
     
     // Último bloque
-    nbloque = traducir_bloque_inodo(ninodo, ultimoBLogico, 0);
-    if(nbloque==-1)return leidos;
-    if(bread(nbloque, buf_bloque)== -1) return -1;
+    nbfisico = traducir_bloque_inodo(ninodo, ultimoBLogico, 0);
+    if(nbfisico != -1)return leidos;
+    if(bread(nbfisico, buf_bloque) == -1) return -1;
     memcpy (buf_original+(nbytes-desp2-1), buf_bloque, desp2+1);
     leidos += desp2+1;
 
@@ -195,13 +189,13 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
  * @return EXIT_SUCCESS o EXIT_FAILURE
  */
 int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
-    //Comprobar que tiene permisos de escritura
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
         return EXIT_FAILURE;
     }
 
     /*
+    //Comprobar que tiene permisos de escritura
     if((inodo.permisos & 2) != 2){
         fprintf(stderr, "El inodo no tiene permisos de escritura.\n");
         return EXIT_FAILURE;

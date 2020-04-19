@@ -44,14 +44,22 @@ int main(int argc, char **argv){
     printf("\nLongitud texto: %d\n\n", tam);
 
     //Un mismo inodo
+    int diferentes_inodos = atoi(argv[3]);
+    /*
     if(atoi(argv[3])==0){
         ninodo= reservar_inodo('f',6);
     }
+    */
     for(int i = 0; i<(sizeof(offsets)/sizeof(offsets[0])); i++){
         //Si diferentes_inodo vale 1, reservaremos un nuevo inodo en cada iteracion
+        if (diferentes_inodos || i == 0){
+            ninodo = reservar_inodo('f',6);
+        }
+        /*
         if(atoi(argv[3])==1){
             ninodo = reservar_inodo('f',6);
         }
+        */
         escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
         if(escritos==-1) {
             fprintf(stderr,"Error durante la escritura.\n");

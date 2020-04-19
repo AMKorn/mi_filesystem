@@ -10,7 +10,7 @@ int main(int argc, char **argv){
 	struct superbloque SB;
 	bread(posSB, &SB);
 
-    printf("DATOS DEL SUPERBLOQUE:\n");
+    printf("\nDATOS DEL SUPERBLOQUE:\n");
     printf("posPrimerBloqueMB = %u\n", SB.posPrimerBloqueMB);
     printf("posUltimoBloqueMB = %u\n", SB.posUltimoBloqueMB);
     printf("posPrimerBloqueAI = %d\n", SB.posPrimerBloqueAI);
@@ -138,7 +138,7 @@ int main(int argc, char **argv){
         return -1;
     }
     printf("SB.posPrimerInodoLibre = %d\n",SB.posPrimerInodoLibre);
-*/
+    */
 
 	bumount();
     return EXIT_SUCCESS;

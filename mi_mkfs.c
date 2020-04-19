@@ -19,6 +19,7 @@ int main(int argc, char **argv){
     initSB(NUM_BLOQUES, NUM_BLOQUES/4);
     initMB();
     initAI();
+    reservar_inodo('d', 7);
     bumount();                              // finalmente cerramos el disco
     return EXIT_SUCCESS;                    // y salimos del programa
 }
