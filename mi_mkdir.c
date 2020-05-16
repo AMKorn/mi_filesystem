@@ -6,7 +6,7 @@
 
 int main(int argc, char **argv){
     if(argc!=4) {
-        fprintf(stderr, "Formato de comando esperado: ./mi_mkdir <disco> <permisos> </ruta>.\n");
+        fprintf(stderr, "Sintaxis: ./mi_mkdir <nombre_dispositivo> <permisos> </ruta>.\n");
         return EXIT_FAILURE;
     }
 

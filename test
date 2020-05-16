@@ -1,0 +1,4 @@
+make
+./test8.sh
+rm disco
+make clean

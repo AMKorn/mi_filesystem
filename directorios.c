@@ -22,7 +22,7 @@ int extraer_camino(const char *camino, char *inicial, char *final, char *tipo){
     if (i==tam){
         final[0]='\0';
         strcpy(tipo, "f");
-    printf("[FICHERO\n");
+    //printf("[FICHERO\n");
 
         return 0;
     } 
@@ -31,7 +31,7 @@ int extraer_camino(const char *camino, char *inicial, char *final, char *tipo){
     camino = strchr(camino, '/'); 
     strcpy(final, camino); //Asignamos a final el contenido de camino a partir de su primer '/' 
     strcpy(tipo, "d");
-    printf("[DIRECTORIO\n");
+    //printf("[DIRECTORIO\n");
     return 1;
 }
 
@@ -58,8 +58,11 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
     printf("[buscar_entrada()→ inicial: %s, final: %s, reservar: %d]\n", inicial, final, reservar);
 
     //buscamos la entrada cuyo nombre se encuentra en inicial
-    if (leer_inodo( *p_inodo_dir, &inodo_dir)==-1) return ERROR_LECTURA_ESCRITURA;
-    if ((inodo_dir.permisos &4) !=4) return ERROR_PERMISO_LECTURA;
+    if (leer_inodo(*p_inodo_dir, &inodo_dir)==-1) return ERROR_LECTURA_ESCRITURA;
+    if ((inodo_dir.permisos &4) !=4) {
+        printf("[buscar_entrada()→ El inodo %d no tiene permisos de lectura]\n", *p_inodo_dir);
+        return ERROR_PERMISO_LECTURA;
+    } 
 
     //el buffer de lectura puede ser un struct tipo entrada 
     //o bien un array de las entradas que caben en un bloque, para optimizar la lectura en RAM
@@ -84,7 +87,7 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
             case 1:  //modo escritura. 
                 //Creamos la entrada en el directorio referenciado por *p_inodo_dir
                 //si es fichero no permitir escritura 
-                printf("Tipo1:  %c, Tipo2:  %c\n", inodo_dir.tipo,tipo);
+                //printf("Tipo1:  %c, Tipo2:  %c\n", inodo_dir.tipo,tipo);
                 if (inodo_dir.tipo == 'f'){ 
                     return ERROR_NO_SE_PUEDE_CREAR_ENTRADA_EN_UN_FICHERO;
                 }
@@ -97,14 +100,14 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
                     if (tipo == 'd') {  //es un directorio
                         if (strcmp(final, "/") == 0) { 
                             if ((entrada.ninodo = reservar_inodo('d', permisos))<0) return ERROR_RESERVAR_INODO;
-                                printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]\n", entrada.ninodo, tipo, permisos);
+                                printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d para %s]\n", entrada.ninodo, tipo, permisos, entrada.nombre);
                                 printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);
                         } else { //cuelgan más diretorios o ficheros
                             return ERROR_NO_EXISTE_DIRECTORIO_INTERMEDIO;
                         }
                     }else{ //es un fichero
                         if ((entrada.ninodo = reservar_inodo('f', permisos))<0) return ERROR_RESERVAR_INODO;
-                        printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]\n", entrada.ninodo, tipo, permisos);
+                        printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d para %s]\n", entrada.ninodo, tipo, permisos, entrada.nombre);
                         printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);      
                     }      
                     if(mi_write_f(*p_inodo_dir, &entrada, num_entrada_inodo*sizeof(struct entrada), sizeof(struct entrada)) == -1){
@@ -123,7 +126,7 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
         // cortamos la recursividad
         *p_inodo = entrada.ninodo;
         *p_entrada = num_entrada_inodo;
-    }else {
+    } else {
         *p_inodo_dir = entrada.ninodo;
         return buscar_entrada (final, p_inodo_dir, p_inodo, p_entrada, reservar, permisos); //Llamada recursiva
     }
@@ -144,6 +147,7 @@ void mostrar_error_buscar_entrada(int error) {
    case -9: fprintf(stderr, "Error: Error reserva inodo.\n"); break;
    }
 }
+
 
 int mi_dir(const char *camino, char *buffer){
     return EXIT_SUCCESS; // TO-DO
