@@ -13,7 +13,7 @@ int extraer_camino(const char *camino, char *inicial, char *final, char *tipo){
     int j = 0;
     int tam = strlen(camino);
     
-    while(camino[i]!= '/' || i<tam) {
+    while(camino[i]!= '/' && camino[i] != '\0'){
         inicial[j] = camino[i];
         i++;
         j++;
