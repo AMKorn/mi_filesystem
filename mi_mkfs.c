@@ -1,4 +1,4 @@
-#include "ficheros_basico.h"
+#include "directorios.h"
 
 #define DISCO argv[1]
 #define NUM_BLOQUES atoi(argv[2])
