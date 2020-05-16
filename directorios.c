@@ -11,32 +11,34 @@ int extraer_camino(const char *camino, char *inicial, char *final, char *tipo){
 
     int i = 1;  //i será 1 ya que sabemos que el primer caracter es '/'
     int j = 0;
-    int tam = strlen(camino);
-    
-    while(camino[i]!= '/' && camino[i] != '\0'){
+    int tam = strlen(camino); 
+
+    while(camino[i]!= '/' && camino[i]!='\0') {       //while(camino[i]!= '/' || i<tam) {
         inicial[j] = camino[i];
         i++;
         j++;
     }
-
     //caso de un fichero
     if (i==tam){
         final[0]='\0';
         strcpy(tipo, "f");
+    printf("[FICHERO\n");
+
         return 0;
     } 
     //caso directorio 
-    camino++;
-    camino = strchr(camino, '/');
-    strcpy(final, camino); //Asignamos a final el contenido de camino a partir de su primer '/'
-    strcpy(tipo, "d");   
+    camino++;  
+    camino = strchr(camino, '/'); 
+    strcpy(final, camino); //Asignamos a final el contenido de camino a partir de su primer '/' 
+    strcpy(tipo, "d");
+    printf("[DIRECTORIO\n");
     return 1;
 }
 
 int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char permisos){
        if(strcmp(camino_parcial, "/") == 0){    //Directorio Raiz
-        p_inodo = 0;
-        p_entrada = 0;
+        *p_inodo = 0;
+        *p_entrada = 0;
         return EXIT_SUCCESS;
     }
 
@@ -45,12 +47,12 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
     char tipo;
     //int tamNombre = sizeof(entrada.nombre);
     char inicial[sizeof(entrada.nombre)];
-    char final[sizeof(strlen(camino_parcial))];
-    memset(inicial, 0, sizeof(entrada.nombre)); //previamente inicializar el buffer de lectura con 0s
-	memset(final, 0, strlen(camino_parcial));   
+    char final[strlen(camino_parcial)];
+    memset(inicial, 0, sizeof(inicial)); //previamente inicializar el buffer de lectura con 0s
+	memset(final, 0, strlen(camino_parcial));  
+     
     memset(entrada.nombre, 0, sizeof(entrada.nombre));
     //int camino;
-
     if (extraer_camino (camino_parcial, inicial, final, &tipo) ==-1) return ERROR_CAMINO_INCORRECTO; 
 
     printf("[buscar_entrada()→ inicial: %s, final: %s, reservar: %d]\n", inicial, final, reservar);
@@ -68,7 +70,7 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
 
     if (cant_entradas_inodo > 0) {
         if(mi_read_f(*p_inodo_dir,&entrada,num_entrada_inodo*sizeof(struct entrada),sizeof(struct entrada)) < 0) return -8; //Leer entrada
-        while ((num_entrada_inodo < cant_entradas_inodo) & (strcmp(inicial,entrada.nombre)!= 0)) { 
+        while ((num_entrada_inodo < cant_entradas_inodo) && (strcmp(inicial,entrada.nombre)!= 0)) { 
         num_entrada_inodo++;
         if(mi_read_f(*p_inodo_dir,&entrada,num_entrada_inodo*sizeof(struct entrada),sizeof(struct entrada)) < 0) return -8; //leer siguiente entrada
         }
