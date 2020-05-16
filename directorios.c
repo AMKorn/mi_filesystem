@@ -1,5 +1,7 @@
 #include "directorios.h"
 
+struct UltimaEntrada UltimaEntradaEscritura;
+
 /*
 Retorna
 0: Fichero
@@ -185,4 +187,21 @@ int mi_stat(const char *camino, struct STAT *p_stat){
     }
     printf("Número de Inodo: %d\n", p_inodo);
     return mi_stat_f(p_inodo, p_stat);
+}
+
+int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned int nbytes){
+    unsigned int p_inodo_dir, p_inodo, p_entrada;
+    p_inodo_dir=0;
+    char reservar=0;
+    char permisos=7;
+    if(strcmp(camino, UltimaEntradaEscritura.camino)==0){
+        p_inodo = UltimaEntradaEscritura.p_inodo;
+    } else {
+        int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
+        if(e != EXIT_SUCCESS){
+            mostrar_error_buscar_entrada(e);
+            return -1;
+        }
+    }
+    return mi_write_f(p_inodo, buf, offset, nbytes);
 }
