@@ -1,28 +1,44 @@
 #include "directorios.h"
 
+#define disco argv[1]
+#define camino argv[2]
+
+// Definitions of color codes.
+#define RESET_COLOR             "\x1b[0m"
+#define ROJO_T                  "\x1b[91m"
+#define VERDE_T                 "\x1b[92m"
+#define AZUL_T                  "\x1b[94m"
+
 int main(int argc, char **argv){
     if(argc != 3){
         printf("Sintaxis: ./mi_ls <disco> </ruta> \n");
-        return -1;
+        return EXIT_FAILURE;
     }
    
-    bmount(argv[1]);
+    bmount(disco);
       
-    char buffer[50*BLOCKSIZE];
+    char buffer[TAMBUFFER];
     memset(buffer, 0, sizeof(buffer));
-    int dir = mi_dir(argv[2], buffer);
-    if(dir < 0){
-        printf("Error al listar directorio\n");
-        return -1;
-    } else if (dir == 0){
-        printf("No hay ninguna entrada a imprimir\n");
+    int dir;
+    
+    if(camino[strlen(camino)-1] == '/'){
+        dir = mi_dir(camino, buffer, 'd');
     } else {
-        printf("Total de entradas: %d\n\n", dir);
-    printf("Tipo    Permisos    mTime                Tamaño         Nombre\n");
-    printf("---------------------------------------------------------------\n");
-    printf("%s\n", buffer);
+        dir = mi_dir(camino, buffer, 'f');
+    }
+    
+    if(dir <= 0){
+        printf("Error: No existe el archivo o directorio\n");
+        return EXIT_FAILURE;
+    } else {
+        if(camino[strlen(camino)-1] == '/'){
+            printf("Total: %d\n", dir);
+        }
+        printf("Tipo\tPermisos\tmTime\t\t\tTamaño\t\tNombre\n");
+        printf("--------------------------------------------------------------------------------\n");
+        printf("%s\n", buffer);
     }
     bumount();
-    return 0;
+    return EXIT_SUCCESS;
      
 }

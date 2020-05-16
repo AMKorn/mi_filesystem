@@ -11,6 +11,11 @@
 #define ERROR_LECTURA_ESCRITURA -8
 #define ERROR_RESERVAR_INODO -9
 
+#define TAMFILA 100
+#define MAXENTRADAS 1000
+#define TAMBUFFER (TAMFILA*MAXENTRADAS)
+
+
 struct entrada {
     char nombre[60];  //En el SF ext2 la longitud del nombre es 256
     unsigned int ninodo;
@@ -25,7 +30,7 @@ int extraer_camino(const char *camino, char *inicial, char *final, char *tipo);
 int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char permisos);
 void mostrar_error_buscar_entrada(int error);
 int mi_creat(const char *camino, unsigned char permisos);
-int mi_dir(const char *camino, char *buffer);
+int mi_dir(const char *camino, char *buffer, char tipo);
 int mi_chmod(const char *camino, unsigned char permisos);
 int mi_stat(const char *camino, struct STAT *p_stat);
 int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned int nbytes);

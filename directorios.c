@@ -151,12 +151,12 @@ void mostrar_error_buscar_entrada(int error) {
 }
 
 
-int mi_dir(const char *camino, char *buffer){
+int mi_dir(const char *camino, char *buffer, char tipo){
     unsigned int p_inodo_dir = 0;
     unsigned int p_inodo = 0;
     unsigned int p_entrada = 0;
 
-    char longitud[55];
+    char longitud[TAMFILA];
     struct entrada entrada;
 
     if (buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, 0, 6) < 0){
@@ -172,40 +172,35 @@ int mi_dir(const char *camino, char *buffer){
         perror("Sin permisos de lectura");
         return -1;
     }
-    int nentrada;
-    int maxEntradas;
-    //Si el inodo es un directorio miramos su contenido
-    if (inodo.tipo == 'd'){
-        nentrada = 0;
-        maxEntradas = inodo.tamEnBytesLog / sizeof(entrada);
 
+    int nentrada;
+    //Si el inodo es un directorio miramos su contenido
+    if (tipo == 'd'){
+        nentrada = 0;
+        int maxEntradas = inodo.tamEnBytesLog / sizeof(entrada);;
         while (nentrada < maxEntradas){
             //leemos la entrada
             if (mi_read_f(p_inodo, &entrada, nentrada * sizeof(entrada), sizeof(entrada)) < 0){
                 perror("Error mi_read_f en mi_dir");
-                return -1;
+                return EXIT_FAILURE;
             }
 
             if (entrada.ninodo >= 0){
 
                 struct inodo inodoAux;
                 if (leer_inodo(entrada.ninodo, &inodoAux) == -1){
-                    return -1;
+                    return EXIT_FAILURE;
                 }
 
                 if (inodoAux.tipo != 'l'){
-                    //Escribimos el tipo (fichero/directorio)
+                    //Tipo
                     if (inodoAux.tipo == 'd'){
-                        //tipo directorio
-                        strcat(buffer, "d");
+                        strcat(buffer, "\x1b[91md\t");
+                    } else if (inodoAux.tipo == 'f'){
+                        strcat(buffer, "\x1b[92mf\t");
                     }
-                    else if (inodoAux.tipo == 'f'){
-                        //tipo fichero
-                        strcat(buffer, "f");
-                    }
-                    strcat(buffer, "\t");
 
-                    //Escribimos los permisos del fichero/directorio
+                    //Permisos
                     if (inodoAux.permisos & 4){
                         strcat(buffer, "r");
                     } else {
@@ -221,46 +216,40 @@ int mi_dir(const char *camino, char *buffer){
                     } else {
                         strcat(buffer, "-");
                     }
+                    strcat(buffer, "\t\t");
+
+                    //mTime
+                    struct tm *ts;
+                    char mtime[TAMFILA];
+                    ts = localtime(&inodoAux.mtime);
+                    strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
+                    strcat(buffer, mtime);
                     strcat(buffer, "\t");
 
-                    //Escribimos el tiempo del fichero/directorio
-                    struct tm *tm;
-                    char tmp[100];
-                    tm = localtime(&inodoAux.mtime);
-                    sprintf(tmp, "%d-%02d-%02d %02d:%02d:%02d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
-                    strcat(buffer, tmp);
-                    strcat(buffer, "\t");
-
-                    //Escribimos el tamaño del fichero/directorio
+                    //Tamaño
                     memset(longitud, '\0', sizeof(longitud));
-                    sprintf(longitud, " %d bytes", inodoAux.tamEnBytesLog);
+                    sprintf(longitud, "%d bytes", inodoAux.tamEnBytesLog);
                     strcat(buffer, longitud);
-                    strcat(buffer, "\t");
+                    strcat(buffer, "\t\t");
 
-                    //Escribimos el nombre del fichero
+                    //Nombre
                     strcat(buffer, entrada.nombre);
-                    strcat(buffer, "\t");
-                    strcat(buffer, "\n");
+                    strcat(buffer, "\n\x1b[0m");
 
                     nentrada++;
                 }
-            } else {
-                return 0;
             }
         }
-    }
-    //Si es un fichero imprimimos su propia información siguiendo la misma estructura que arriba
-    else if (inodo.tipo == 'f') {
+    } else if (tipo == 'f') {
         nentrada = 1;
-        strcat(buffer, "f");
+        strcat(buffer, "\x1b[92mf\t");
 
-        strcat(buffer, "\t");
-
-        if (mi_read_f(p_inodo, &entrada, nentrada * sizeof(entrada), sizeof(entrada)) < 0) {
+        if (mi_read_f(p_inodo, &entrada, nentrada*sizeof(entrada), sizeof(entrada)) < 0) {
             perror("Error mi_read_f en mi_dir");
-            return -1;
+            return EXIT_FAILURE;
         }
 
+        //Permisos
         if (inodo.permisos & 4){
             strcat(buffer, "r");
         } else {
@@ -271,34 +260,35 @@ int mi_dir(const char *camino, char *buffer){
         } else {
             strcat(buffer, "-");
         }
-        if (inodo.permisos & 1) {
+        if (inodo.permisos & 1){
             strcat(buffer, "x");
         } else {
             strcat(buffer, "-");
         }
+        strcat(buffer, "\t\t");
+
+        //mTime
+        struct tm *ts;
+        char mtime[TAMFILA];
+        ts = localtime(&inodo.mtime);
+        strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
+        strcat(buffer, mtime);
         strcat(buffer, "\t");
 
-        struct tm *tm;
-        char tmp[100];
-        tm = localtime(&inodo.mtime);
-        sprintf(tmp, "%d-%02d-%02d %02d:%02d:%02d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
-        strcat(buffer, tmp);
-        strcat(buffer, "\t");
-
+        //Tamaño
         memset(longitud, '\0', sizeof(longitud));
-        sprintf(longitud, " %d bytes", inodo.tamEnBytesLog);
+        sprintf(longitud, "%d bytes", inodo.tamEnBytesLog);
         strcat(buffer, longitud);
-        strcat(buffer, "\t");
-        //Para obtener el nombre debemos recorrer el camino hasta llegar a tener final vacío
-        //así inicial tendrá el nombre del fichero
+        strcat(buffer, "\t\t");
+        
+        //Nombre
         char tipo, inicial[strlen(camino)], final[strlen(camino)];
         extraer_camino(camino, inicial, final, &tipo);
-        while(*final != '\0'){
-            extraer_camino(camino, inicial, final, &tipo);
+        while(tipo!='f'){
+            extraer_camino(final, inicial, final, &tipo);
         }
         strcat(buffer, inicial);
-        strcat(buffer, "\t");
-        strcat(buffer, "\n");
+        strcat(buffer, "\n\x1b[0m");
     }
     return nentrada;
 }
