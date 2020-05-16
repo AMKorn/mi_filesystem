@@ -343,7 +343,7 @@ int mi_stat(const char *camino, struct STAT *p_stat){
     }    
 
     printf("Número de Inodo: %d\n", p_inodo);
-    printf("Tipo %s\n", &p_stat->tipo);
+    printf("Tipo %c\n", &p_stat->tipo);
     printf("Permisos %s\n", &p_stat->permisos);
     printf("atime: %ln\n", &p_stat->atime);
     printf("ctime: %ln\n", &p_stat->ctime);
