@@ -1,20 +1,12 @@
 #include "directorios.h"
 
-<<<<<<< HEAD
 struct UltimaEntrada UltimaEntradaEscritura;
 
-/*
-Retorna
-0: Fichero
-1: Directorio
-*/
-=======
 /**
  * Retorna
  * 0: Fichero
  * 1: Directorio
  */
->>>>>>> 0e342403f56196a157fb27c1def103bdb4f1c7eb
 int extraer_camino(const char *camino, char *inicial, char *final, char *tipo){
     //Primero comprobamos que empiece por '/'
     if (camino[0] != '/') return -1;
@@ -368,6 +360,7 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
     p_inodo_dir=0;
     char reservar=0;
     char permisos=7;
+    // Comprobar caché
     if(strcmp(camino, UltimaEntradaEscritura.camino)==0){
         p_inodo = UltimaEntradaEscritura.p_inodo;
     } else {
@@ -376,6 +369,9 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
             mostrar_error_buscar_entrada(e);
             return -1;
         }
+        // Actualizar caché
+        strcpy(UltimaEntradaEscritura.camino, camino);
+        UltimaEntradaEscritura.p_inodo=p_inodo;
     }
     return mi_write_f(p_inodo, buf, offset, nbytes);
 }
