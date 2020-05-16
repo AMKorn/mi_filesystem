@@ -76,7 +76,7 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
         }
     }
 
-    if ((num_entrada_inodo == cant_entradas_inodo)){  
+    if ((num_entrada_inodo == cant_entradas_inodo) && strcmp(inicial,entrada.nombre)!=0){  
     //la entrada no existe
         switch(reservar){
             case 0:  //modo consulta. Como no existe retornamos error
@@ -84,6 +84,7 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
             case 1:  //modo escritura. 
                 //Creamos la entrada en el directorio referenciado por *p_inodo_dir
                 //si es fichero no permitir escritura 
+                printf("Tipo1:  %c, Tipo2:  %c\n", inodo_dir.tipo,tipo);
                 if (inodo_dir.tipo == 'f'){ 
                     return ERROR_NO_SE_PUEDE_CREAR_ENTRADA_EN_UN_FICHERO;
                 }
@@ -96,11 +97,15 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
                     if (tipo == 'd') {  //es un directorio
                         if (strcmp(final, "/") == 0) { 
                             if ((entrada.ninodo = reservar_inodo('d', permisos))<0) return ERROR_RESERVAR_INODO;
+                                printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]\n", entrada.ninodo, tipo, permisos);
+                                printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);
                         } else { //cuelgan más diretorios o ficheros
                             return ERROR_NO_EXISTE_DIRECTORIO_INTERMEDIO;
                         }
                     }else{ //es un fichero
-                        if ((entrada.ninodo = reservar_inodo('f', permisos))<0) return ERROR_RESERVAR_INODO;      
+                        if ((entrada.ninodo = reservar_inodo('f', permisos))<0) return ERROR_RESERVAR_INODO;
+                        printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]\n", entrada.ninodo, tipo, permisos);
+                        printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);      
                     }      
                     if(mi_write_f(*p_inodo_dir, &entrada, num_entrada_inodo*sizeof(struct entrada), sizeof(struct entrada)) == -1){
                         if(entrada.ninodo != -1){
@@ -113,13 +118,11 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
         }
     }
 
-   if(strcmp(final, "/") == 0){
+   if((strcmp(final, "/") == 0) || (strcmp(final, "")==0)){
         if ((num_entrada_inodo < cant_entradas_inodo) && (reservar==1)) return ERROR_ENTRADA_YA_EXISTENTE; //modo escritura y la entrada ya existe
         // cortamos la recursividad
         *p_inodo = entrada.ninodo;
         *p_entrada = num_entrada_inodo;
-        printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]\n", entrada.ninodo, inodo_dir.tipo, permisos);
-        printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);
     }else {
         *p_inodo_dir = entrada.ninodo;
         return buscar_entrada (final, p_inodo_dir, p_inodo, p_entrada, reservar, permisos); //Llamada recursiva
