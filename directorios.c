@@ -56,7 +56,7 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
     printf("[buscar_entrada()→ inicial: %s, final: %s, reservar: %d]\n", inicial, final, reservar);
 
     //buscamos la entrada cuyo nombre se encuentra en inicial
-    if (leer_inodo( *p_inodo_dir, &inodo_dir)==-1) return -8;
+    if (leer_inodo( *p_inodo_dir, &inodo_dir)==-1) return ERROR_LECTURA_ESCRITURA;
     if ((inodo_dir.permisos &4) !=4) return ERROR_PERMISO_LECTURA;
 
     //el buffer de lectura puede ser un struct tipo entrada 
@@ -139,7 +139,6 @@ void mostrar_error_buscar_entrada(int error) {
    case -9: fprintf(stderr, "Error: Error reserva inodo.\n"); break;
    }
 }
-
 
 int mi_dir(const char *camino, char *buffer){
     return EXIT_SUCCESS; // TO-DO
