@@ -8,6 +8,15 @@ int main(int argc, char **argv){
         fprintf(stderr, "Formato de comando esperado: ./mi_stat <disco> </ruta>.\n");
         return EXIT_FAILURE;
     }
+
+    // Montamos el disco
+    if(bmount(DISCO)==-1) return EXIT_FAILURE;
+
     struct STAT p_stat;
-    return mi_stat(RUTA, &p_stat);
+    if(mi_stat(RUTA, &p_stat)==EXIT_FAILURE) return EXIT_FAILURE;
+
+    // Desmontar el disco
+    if(bumount(DISCO)==-1) return EXIT_FAILURE;
+
+    return EXIT_SUCCESS;
 }

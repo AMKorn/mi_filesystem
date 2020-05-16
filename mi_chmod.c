@@ -9,10 +9,19 @@ int main(int argc, char **argv){
         fprintf(stderr, "Formato de comando esperado: ./mi_chmod <disco> <permisos> </ruta>.\n");
         return EXIT_FAILURE;
     }
+
+    // Montamos el disco
+    if(bmount(DISCO)==-1) return EXIT_FAILURE;
+
     unsigned char permisos = PERMISOS;
     if(permisos > 7){
         fprintf(stderr, "Modo inválido: <<%d>>. Debe ser un número del 0 al 7.\n", permisos);
         return EXIT_FAILURE;
     }
-    return mi_chmod(RUTA, permisos);
+    if(mi_chmod(RUTA, permisos)==EXIT_FAILURE) return EXIT_FAILURE;
+
+    // Desmontar el disco
+    if(bumount(DISCO)==-1) return EXIT_FAILURE;
+
+    return EXIT_SUCCESS;
 }
