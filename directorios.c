@@ -1,4 +1,5 @@
 #include "directorios.h"
+
 /*
 Retorna
 0: Fichero
@@ -33,9 +34,6 @@ int extraer_camino(const char *camino, char *inicial, char *final, char *tipo){
      
 
 }
-
-
-
 
 int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char permisos){
        if(strcmp(camino_parcial, "/") == 0){    //Directorio Raiz
@@ -107,6 +105,7 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
                 break;
         }
     }
+
    if(strcmp(final, "/") == 0){
         if ((num_entrada_inodo < cant_entradas_inodo) && (reservar=1)) return ERROR_ENTRADA_YA_EXISTENTE; //modo escritura y la entrada ya existe
         // cortamos la recursividad
@@ -131,4 +130,46 @@ void mostrar_error_buscar_entrada(int error) {
    case -7: fprintf(stderr, "Error: No es un directorio.\n"); break;
    case -8: fprintf(stderr, "Error: Error al extraer el camino.\n"); break;
    }
+}
+
+int mi_dir(const char *camino, char *buffer){
+    return EXIT_SUCCESS; // TO-DO
+}
+
+int mi_creat(const char *camino, unsigned char permisos){
+    unsigned int p_inodo_dir, p_inodo, p_entrada;
+    p_inodo_dir=0;
+    char reservar = 1;
+    int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
+    if(e != EXIT_SUCCESS){
+        mostrar_error_buscar_entrada(e);
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}
+
+int mi_chmod(const char *camino, unsigned char permisos){
+    unsigned int p_inodo_dir, p_inodo, p_entrada;
+    p_inodo_dir=0;
+    char reservar = 0;
+    int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
+    if(e != EXIT_SUCCESS){
+        mostrar_error_buscar_entrada(e);
+        return EXIT_FAILURE;
+    }
+    return mi_chmod_f(p_inodo, permisos);
+}
+
+int mi_stat(const char *camino, struct STAT *p_stat){
+    unsigned int p_inodo_dir, p_inodo, p_entrada;
+    p_inodo_dir=0;
+    char reservar = 0;
+    char permisos = 7;
+    int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
+    if(e != EXIT_SUCCESS){
+        mostrar_error_buscar_entrada(e);
+        return EXIT_FAILURE;
+    }
+    printf("Número de Inodo: %d\n", p_inodo);
+    return mi_stat_f(p_inodo, p_stat);
 }
