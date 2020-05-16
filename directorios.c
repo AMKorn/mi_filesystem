@@ -23,15 +23,13 @@ int extraer_camino(const char *camino, char *inicial, char *final, char *tipo){
         final[0]='\0';
         strcpy(tipo, "f");
         return 0;
-    } else {
-        //caso directorio   */*
-        camino++;   //Desplazamos en 1 el puntero caracteres de camino
-        final = strchr(camino,'/'); //Asignamos a final el contenido de camino a partir de su primer '/'
-        strcpy(tipo,"d");   
-        return 1;
-    }
-     
-
+    } 
+    //caso directorio 
+    camino++;
+    camino = strchr(camino, '/');
+    strcpy(final, camino); //Asignamos a final el contenido de camino a partir de su primer '/'
+    strcpy(tipo, "d");   
+    return 1;
 }
 
 
