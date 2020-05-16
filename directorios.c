@@ -342,15 +342,27 @@ int mi_stat(const char *camino, struct STAT *p_stat){
         return EXIT_FAILURE;
     }    
 
+    char atime[80];
+    char mtime[80];
+    char ctime[80];
+    struct tm *ts;
+
+    ts = localtime(&p_stat->atime);
+    strftime(atime, sizeof(atime), "%a %Y-%m-%d %H:%M:%S", ts);
+    ts = localtime(&p_stat->mtime);
+    strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
+    ts = localtime(&p_stat->ctime);
+    strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
+
     printf("Número de Inodo: %d\n", p_inodo);
-    printf("Tipo %s\n", &p_stat->tipo);
-    printf("Permisos %s\n", &p_stat->permisos);
-    printf("atime: %ln\n", &p_stat->atime);
-    printf("ctime: %ln\n", &p_stat->ctime);
-    printf("mtime: %ln\n", &p_stat->mtime);
-    printf("nlinks: %ls\n", &p_stat->nlinks);
-    printf("tamEnBytesLog: %ls\n", &p_stat->tamEnBytesLog);
-    printf("numBloquesOcupados: %ls\n", &p_stat->numBloquesOcupados);
+    printf("Tipo: %d\n", p_stat.tipo);
+    printf("Permisos %d\n", p_stat->permisos);
+    printf("atime: %s\n", atime);
+    printf("ctime: %s\n", ctime);
+    printf("mtime: %s\n", mtime);
+    printf("nlinks: %d\n", p_stat->nlinks);
+    printf("tamEnBytesLog: %d\n", p_stat->tamEnBytesLog);
+    printf("numBloquesOcupados: %d\n", p_stat->numBloquesOcupados);
 
     return EXIT_SUCCESS;
 }
