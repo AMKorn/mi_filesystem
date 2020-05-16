@@ -8,7 +8,8 @@
 #define ERROR_PERMISO_ESCRITURA -5
 #define ERROR_ENTRADA_YA_EXISTENTE -6
 #define ERROR_NO_SE_PUEDE_CREAR_ENTRADA_EN_UN_FICHERO -7
-#define ERROR_EXTRAER_CAMINO -8
+#define ERROR_LECTURA_ESCRITURA -8
+#define ERROR_RESERVAR_INODO -9
 
 struct entrada {
     char nombre[60];  //En el SF ext2 la longitud del nombre es 256
