@@ -405,7 +405,7 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
 int mi_link(const char *camino1, const char *camino2){
     
     //HAY QUE TENER EN CUENTA: camino1 y camino2 han de referirse a un fichero!!!   Ruben -> (Creo que en uno de mis codigos hice algo parecido, si me acuerdo lo miro)
-    unsigned int p_inodo_dir1, p_inodo_dir2, p_inodo1, p_inodo2, p_entrada1, p_entrada2;
+    unsigned int p_inodo_dir1, p_inodo1, p_entrada1;//, p_inodo_dir2, p_inodo2, p_entrada2;
     p_inodo_dir1=0;
     char reservar=0;
     char permisos=7;
@@ -422,27 +422,30 @@ int mi_link(const char *camino1, const char *camino2){
         fprintf(stderr, "El fichero/archivo no tiene permisos de lectura\n");
         return EXIT_FAILURE;
     }
-
-    p_inodo_dir2=0;
+    
+    int ninodo1 = p_inodo1;
+    leer_inodo(ninodo1, &ino);
+    p_inodo1=0;
+    p_inodo_dir1=0;
     permisos=6;
     reservar=1;
     //Comprobamos que camino 2 no exista
-    e = buscar_entrada(camino2, &p_inodo_dir2, &p_inodo2, &p_entrada2, reservar, permisos);
+    e = buscar_entrada(camino2, &p_inodo_dir1, &p_inodo1, &p_entrada1, reservar, permisos);
     //Se crea en escritura y ha de devolver error en caso de que la entrada no exista.
     if(e != EXIT_SUCCESS && e != ERROR_ENTRADA_YA_EXISTENTE){
         mostrar_error_buscar_entrada(e);
         return EXIT_FAILURE;
     }
     //Leemos la entrada creada correspondiente a camino2, o sea la entrada p_entrada2 de p_inodo_dir2
-    mi_read_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
+    mi_read_f(p_inodo1, &entrada, p_entrada1*sizeof(struct entrada), sizeof(struct entrada));
     //Creamos el enlace: Asociamos a esta entrada el mismo inodo que el asociado a la entrada de camino1, es decir p_inodo1.
-    mi_write_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
+    mi_write_f(p_inodo1, &entrada, p_entrada1*sizeof(struct entrada), sizeof(struct entrada));
     //Escribimos la entrada modificada en p_inodo_dir2
-    escribir_inodo(p_inodo2, ino);
+    escribir_inodo(p_inodo1, ino);
     //Liberamos el inodo que se ha asociado a la entrada creada, p_inodo2 
-    liberar_inodo(p_inodo2);
+    liberar_inodo(p_inodo1);
     //Incrementamos la cantidad de enlaces de p_inodo1, actualizamos el ctime y lo salvamos
-    leer_inodo(p_inodo1, &ino);
+    
     ino.nlinks++;
     ino.ctime = time (NULL);
     escribir_inodo(p_inodo1, ino);
@@ -450,11 +453,11 @@ int mi_link(const char *camino1, const char *camino2){
     return EXIT_SUCCESS;
     
 }
+
 /*
 Función de la capa de directorios que borra la entrada de directorio especificada (no hay que olvidar actualizar la cantidad de enlaces en el inodo) y, 
 en caso de que fuera el último enlace existente, borrar el propio fichero/directorio.
 */
-
 int mi_unlink(const char *camino){
 
     unsigned int p_inodo_dir, p_inodo, p_entrada, nentradas;
