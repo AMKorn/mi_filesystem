@@ -436,9 +436,9 @@ int mi_link(const char *camino1, const char *camino2){
     //Leemos la entrada creada correspondiente a camino2, o sea la entrada p_entrada2 de p_inodo_dir2
     mi_read_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
     //Creamos el enlace: Asociamos a esta entrada el mismo inodo que el asociado a la entrada de camino1, es decir p_inodo1.
-    mir_write_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
+    mi_write_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
     //Escribimos la entrada modificada en p_inodo_dir2
-    escribir_inodo(ino, p_inodo2);
+    escribir_inodo(p_inodo2, ino);
     //Liberamos el inodo que se ha asociado a la entrada creada, p_inodo2 
     liberar_inodo(p_inodo2);
     //Incrementamos la cantidad de enlaces de p_inodo1, actualizamos el ctime y lo salvamos
@@ -450,7 +450,65 @@ int mi_link(const char *camino1, const char *camino2){
     return EXIT_SUCCESS;
     
 }
+/*
+Función de la capa de directorios que borra la entrada de directorio especificada (no hay que olvidar actualizar la cantidad de enlaces en el inodo) y, 
+en caso de que fuera el último enlace existente, borrar el propio fichero/directorio.
+*/
 
 int mi_unlink(const char *camino){
+
+    unsigned int p_inodo_dir, p_inodo, p_entrada, nentradas;
+    p_inodo_dir=0;
+    char reservar=0;
+    char permisos=7;
+    struct inodo ino;
+    struct entrada entrada;
+
+    //Hay que comprobar que la entrada camino exista y obtener su nº de entrada (p_entrada), mediante la función buscar_entrada().
+    int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
+    if(e != EXIT_SUCCESS){
+        mostrar_error_buscar_entrada(e);
+        return EXIT_FAILURE;
+    }
+
+    //Si se trata de un directorio  y no está vacío (inodo.tamEnBytesLog > 0) entonces no se puede borrar y salimos de la función. En caso contrario:
+    //Mediante la función leer_inodo() leemos el inodo asociado al directorio que contiene la entrada que queremos eliminar (p_inodo_dir), 
+    //y obtenemos el nº de entradas que tiene (inodo_dir.tamEnBytesLog/sizeof(struct entrada))
+    if(leer_inodo(p_inodo,&ino));
+    if(ino.tipo != 'f') {
+        fprintf(stderr,"Camino ha de referirse a un directorio, no a un fichero");
+        return -1;
+    }
+    //Si la entrada a eliminar es la última (p_entrada ==nº entradas - 1), basta con truncar el inodo a su tamaño menos el tamaño de una entrada, mediante la función mi_truncar_f()
+    nentradas = ino.tamEnBytesLog/sizeof(struct entrada);
+    if (p_entrada == nentradas-1){
+        if (mi_truncar_f(p_inodo_dir, nentradas-sizeof(struct entrada))){
+            fprintf(stderr,"Error en truncar");
+            return -1;
+        }
+        //Si no es la última entrada, entonces tenemos que leer la última y colocarla en la posición de la entrada que queremos eliminar (p_entrada), 
+        //y después ya podemos truncar el inodo como en el caso anterior. 
+        //De esta manera siempre dejaremos las entradas de un directorio consecutivas para cuando tengamos que utilizar la función buscar_entrada()
+    } else {
+        if(mi_read_f(p_inodo_dir, &entrada, (nentradas-1) * sizeof(struct entrada), sizeof(struct entrada)) == -1) return -1;
+		if(mi_write_f(p_inodo_dir,&entrada, p_entrada*sizeof(struct entrada), sizeof(struct entrada)) == -1) return -1;
+        if (mi_truncar_f(p_inodo_dir,nentradas - sizeof(struct entrada))){
+            fprintf(stderr,"Error en truncar");
+            return -1;
+        }
+    }
+    //Leemos el inodo asociado a la entrada eliminada para decrementar el nº de enlaces
+    leer_inodo(p_inodo,&ino);
+        ino.nlinks--;
+    //Si no quedan enlaces (nlinks) entonces liberaremos el inodo, en caso contrario actualizamos su ctime y escribimos el inodo.
+    if(ino.nlinks < 1){
+        liberar_inodo(p_inodo);
+    } else {
+        ino.ctime = time(NULL);
+        if(escribir_inodo(p_inodo, ino) < 0){
+            fprintf(stderr,"Error al escribir inodo");
+            return -1; //Error ESCRIBIR_INODO
+        }
+    }
     return EXIT_SUCCESS;
 }
