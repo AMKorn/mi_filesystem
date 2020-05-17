@@ -2,7 +2,7 @@
 
 #define DISCO       argv[1]
 #define RUTA        argv[2]
-#define TAM_BUFFER  1500
+#define TAM_BUFFER  BLOCKSIZE * 4
 
 int main (int argc, char **argv) {
     //Primero: Comprobamos la sintaxis
@@ -42,7 +42,7 @@ int main (int argc, char **argv) {
         //if(leidos == -1) return -1;
     }
     //Imprimimos los resultados
-    fprintf(stderr, "\nTotal_leidos: %d", total);
+    fprintf(stderr, "\nTotal_leidos: %d\n", total);
 
 
     //Desmontamos el disco
