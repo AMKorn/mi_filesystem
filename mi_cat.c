@@ -14,7 +14,7 @@ int main (int argc, char **argv) {
     //Luego Comprobamos si la ruta corresponde a un fichero
 	//char *path = RUTA;
     if(RUTA[strlen(RUTA)-1] == '/'){
-        printf("ERROR: No es un fichero.\n",camino);
+        printf("ERROR: No es un fichero.\n");
         return -1;
     }
 
@@ -30,14 +30,14 @@ int main (int argc, char **argv) {
 
 
     //Iniciamos la lectura
-    leidos = mi_read_f(RUTA, buff_texto,offset, TAM_BUFFER);
+    leidos = mi_read(RUTA, buff_texto,offset, TAM_BUFFER);
     //if(leidos == -1) return -1;
     while (leidos>0){
         write(1,buff_texto,leidos);
         total += leidos;
         offset += TAM_BUFFER;
         memset(buff_texto, 0, TAM_BUFFER);
-        leidos = mi_read_f(ninodo, buff_texto,offset, TAM_BUFFER);
+        leidos = mi_read(RUTA, buff_texto,offset, TAM_BUFFER);
         
         //if(leidos == -1) return -1;
     }
