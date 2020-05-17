@@ -427,3 +427,7 @@ int mi_link(const char *camino1, const char *camino2){
     // ????
     return 0;
 }
+
+int mi_unlink(const char *camino){
+    return EXIT_SUCCESS;
+}
