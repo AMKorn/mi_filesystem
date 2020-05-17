@@ -12,6 +12,10 @@
 #define INDIRECTOS1 (NPUNTEROS * NPUNTEROS + INDIRECTOS0)               //65.804   
 #define INDIRECTOS2 (NPUNTEROS * NPUNTEROS * NPUNTEROS + INDIRECTOS1)   //16.843.020
 
+#define MASC_READ 4
+#define MASC_WRTE 2
+#define MASC_EXEC 1
+
 struct superbloque {
    unsigned int posPrimerBloqueMB;                       // Posición del primer bloque del mapa de bits en el SF
    unsigned int posUltimoBloqueMB;                       // Posición del último bloque del mapa de bits en el SF

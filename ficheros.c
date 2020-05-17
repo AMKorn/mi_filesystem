@@ -10,7 +10,7 @@
 int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offset, unsigned int nbytes){
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
-    if((inodo.permisos & 2) != 2){
+    if((inodo.permisos & MASC_WRTE) != MASC_WRTE){
         fprintf(stderr, "El inodo no tiene permisos de escritura. Permisos: %d\n", inodo.permisos);
         return -1;
     }

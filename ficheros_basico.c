@@ -511,11 +511,11 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
             if (nivel_punteros == nRangoBL) { 
                //El bloque cuelga directamente del inodo
                inodo.punterosIndirectos[nRangoBL-1] = ptr;
-			      fprintf(stdout,"[traducir_bloque_inodo()→ inodo.punterosIndirectos[%d] = %d (reservado BF %d para punteros_nivel%d)]\n",(nRangoBL-1),ptr,ptr,nRangoBL);
+			      //fprintf(stdout,"[traducir_bloque_inodo()→ inodo.punterosIndirectos[%d] = %d (reservado BF %d para punteros_nivel%d)]\n",(nRangoBL-1),ptr,ptr,nRangoBL);
 
             } else { //El bloque cuelga de otro bloque de punteros
                buffer[indice] = ptr;
-			      fprintf(stdout,"[traducir_bloque_inodo()→ punteros_nivel%d [%d] = %d (reservado BF %d para punteros_nivel%d)]\n",(nivel_punteros+1),indice,ptr,ptr,nivel_punteros);
+			      //fprintf(stdout,"[traducir_bloque_inodo()→ punteros_nivel%d [%d] = %d (reservado BF %d para punteros_nivel%d)]\n",(nivel_punteros+1),indice,ptr,ptr,nivel_punteros);
                bwrite(ptr_ant, buffer);                
          	}
 		   } 
@@ -536,11 +536,11 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
          inodo.ctime = time(NULL);
          if (nRangoBL==0){
          inodo.punterosDirectos[nblogico] = ptr;
-			fprintf(stdout,"[traducir_bloque_inodo()→ inodo.punterosDirectos[%d] = %d (reservado BF %d para BL %u)]\n",nblogico,ptr,ptr,nblogico);
+			//fprintf(stdout,"[traducir_bloque_inodo()→ inodo.punterosDirectos[%d] = %d (reservado BF %d para BL %u)]\n",nblogico,ptr,ptr,nblogico);
 
          }else {
             buffer[indice] = ptr; 
-			   fprintf(stdout,"[traducir_bloque_inodo()→ punteros_nivel%d [%d] = %d (reservado BF %d para BL %u)]\n",(nivel_punteros+1),indice,ptr,ptr,nblogico);
+			   //fprintf(stdout,"[traducir_bloque_inodo()→ punteros_nivel%d [%d] = %d (reservado BF %d para BL %u)]\n",(nivel_punteros+1),indice,ptr,ptr,nblogico);
             bwrite(ptr_ant, buffer);
          }
       }

@@ -150,6 +150,17 @@ void mostrar_error_buscar_entrada(int error) {
    }
 }
 
+int mi_creat(const char *camino, unsigned char permisos){
+    unsigned int p_inodo_dir, p_inodo, p_entrada;
+    p_inodo_dir=0;
+    char reservar = 1;
+    int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
+    if(e != EXIT_SUCCESS){
+        mostrar_error_buscar_entrada(e);
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}
 
 int mi_dir(const char *camino, char *buffer, char tipo){
     unsigned int p_inodo_dir = 0;
@@ -293,18 +304,6 @@ int mi_dir(const char *camino, char *buffer, char tipo){
     return nentrada;
 }
 
-int mi_creat(const char *camino, unsigned char permisos){
-    unsigned int p_inodo_dir, p_inodo, p_entrada;
-    p_inodo_dir=0;
-    char reservar = 1;
-    int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
-    if(e != EXIT_SUCCESS){
-        mostrar_error_buscar_entrada(e);
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-}
-
 int mi_chmod(const char *camino, unsigned char permisos){
     unsigned int p_inodo_dir, p_inodo, p_entrada;
     p_inodo_dir=0;
@@ -376,4 +375,30 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
         UltimaEntradaEscritura.p_inodo=p_inodo;
     }
     return mi_write_f(p_inodo, buf, offset, nbytes);
+}
+
+int mi_link(const char *camino1, const char *camino2){
+    unsigned int p_inodo_dir1, p_inodo_dir2, p_inodo1, p_inodo2, p_entrada1, p_entrada2;
+    p_inodo_dir1=0;
+    char reservar=0;
+    char permisos=7;
+    int e = buscar_entrada(camino1, &p_inodo_dir1, &p_inodo1, &p_entrada1, reservar, permisos);
+    if(e != EXIT_SUCCESS){
+        mostrar_error_buscar_entrada(e);
+        return EXIT_FAILURE;
+    }
+    if((permisos & MASC_WRTE) != MASC_WRTE){
+        fprintf(stderr, "El fichero/archivo no tiene permisos de lectura\n");
+        return EXIT_FAILURE;
+    }
+    p_inodo_dir2=0;
+    permisos=6;
+    reservar=1;
+    e = buscar_entrada(camino2, &p_inodo_dir2, &p_inodo2, &p_entrada2, reservar, permisos);
+    if(e != EXIT_SUCCESS && e != ERROR_ENTRADA_YA_EXISTENTE){
+        mostrar_error_buscar_entrada(e);
+        return EXIT_FAILURE;
+    }
+    // ????
+    return 0;
 }
