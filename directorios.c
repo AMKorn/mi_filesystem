@@ -1,6 +1,7 @@
 #include "directorios.h"
 
 struct UltimaEntrada UltimaEntradaEscritura;
+struct UltimaEntrada UltimaEntradaLectura;
 
 /**
  * Retorna
@@ -387,17 +388,18 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
     int leidos;
     int error;
 
-    if ((error = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos)) < 0) {
-    mostrar_error_buscar_entrada(error);
-    return EXIT_FAILURE;
-    } else {
+    if(strcmp(camino, UltimaEntradaLectura.camino)==0){
+        p_inodo = UltimaEntradaLectura.p_inodo;
+    } else if ((error = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos)) < 0) {
+        mostrar_error_buscar_entrada(error);
+        return EXIT_FAILURE;
+    }
     leidos = mi_read_f(p_inodo, buf, offset, nbytes);
     if(leidos==-1){
         fprintf(stderr,"ERRORR; MI_READ_F");
         return -1;
     }
     return leidos; 
-    }
 }
 
 int mi_link(const char *camino1, const char *camino2){
