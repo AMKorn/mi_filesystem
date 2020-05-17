@@ -403,29 +403,52 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
 }
 
 int mi_link(const char *camino1, const char *camino2){
+    
+    //HAY QUE TENER EN CUENTA: camino1 y camino2 han de referirse a un fichero!!!   Ruben -> (Creo que en uno de mis codigos hice algo parecido, si me acuerdo lo miro)
     unsigned int p_inodo_dir1, p_inodo_dir2, p_inodo1, p_inodo2, p_entrada1, p_entrada2;
     p_inodo_dir1=0;
     char reservar=0;
     char permisos=7;
+    struct inodo ino;
+    struct entrada entrada;
+    //Comprobamos que camino1 exista
     int e = buscar_entrada(camino1, &p_inodo_dir1, &p_inodo1, &p_entrada1, reservar, permisos);
     if(e != EXIT_SUCCESS){
         mostrar_error_buscar_entrada(e);
         return EXIT_FAILURE;
     }
+    //Comprobar si tiene persmisos de lectura
     if((permisos & MASC_WRTE) != MASC_WRTE){
         fprintf(stderr, "El fichero/archivo no tiene permisos de lectura\n");
         return EXIT_FAILURE;
     }
+
     p_inodo_dir2=0;
     permisos=6;
     reservar=1;
+    //Comprobamos que camino 2 no exista
     e = buscar_entrada(camino2, &p_inodo_dir2, &p_inodo2, &p_entrada2, reservar, permisos);
+    //Se crea en escritura y ha de devolver error en caso de que la entrada no exista.
     if(e != EXIT_SUCCESS && e != ERROR_ENTRADA_YA_EXISTENTE){
         mostrar_error_buscar_entrada(e);
         return EXIT_FAILURE;
     }
-    // ????
-    return 0;
+    //Leemos la entrada creada correspondiente a camino2, o sea la entrada p_entrada2 de p_inodo_dir2
+    mi_read_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
+    //Creamos el enlace: Asociamos a esta entrada el mismo inodo que el asociado a la entrada de camino1, es decir p_inodo1.
+    mir_write_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
+    //Escribimos la entrada modificada en p_inodo_dir2
+    escribir_inodo(ino, p_inodo2);
+    //Liberamos el inodo que se ha asociado a la entrada creada, p_inodo2 
+    liberar_inodo(p_inodo2);
+    //Incrementamos la cantidad de enlaces de p_inodo1, actualizamos el ctime y lo salvamos
+    leer_inodo(p_inodo1, &ino);
+    ino.nlinks++;
+    ino.ctime = time (NULL);
+    escribir_inodo(p_inodo1, ino);
+    //FIN 
+    return EXIT_SUCCESS;
+    
 }
 
 int mi_unlink(const char *camino){
