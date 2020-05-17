@@ -58,12 +58,12 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
     //int camino;
     if (extraer_camino (camino_parcial, inicial, final, &tipo) ==-1) return ERROR_CAMINO_INCORRECTO; 
 
-    printf("[buscar_entrada()→ inicial: %s, final: %s, reservar: %d]\n", inicial, final, reservar);
+    //printf("[buscar_entrada()→ inicial: %s, final: %s, reservar: %d]\n", inicial, final, reservar);
 
     //buscamos la entrada cuyo nombre se encuentra en inicial
     if (leer_inodo(*p_inodo_dir, &inodo_dir)==-1) return ERROR_LECTURA_ESCRITURA;
     if ((inodo_dir.permisos &4) !=4) {
-        printf("[buscar_entrada()→ El inodo %d no tiene permisos de lectura]\n", *p_inodo_dir);
+        //printf("[buscar_entrada()→ El inodo %d no tiene permisos de lectura]\n", *p_inodo_dir);
         return ERROR_PERMISO_LECTURA;
     } 
 
@@ -103,15 +103,15 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
                     if (tipo == 'd') {  //es un directorio
                         if (strcmp(final, "/") == 0) { 
                             if ((entrada.ninodo = reservar_inodo('d', permisos))<0) return ERROR_RESERVAR_INODO;
-                                printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d para %s]\n", entrada.ninodo, tipo, permisos, entrada.nombre);
-                                printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);
+                                //printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d para %s]\n", entrada.ninodo, tipo, permisos, entrada.nombre);
+                                //printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);
                         } else { //cuelgan más diretorios o ficheros
                             return ERROR_NO_EXISTE_DIRECTORIO_INTERMEDIO;
                         }
                     }else{ //es un fichero
                         if ((entrada.ninodo = reservar_inodo('f', permisos))<0) return ERROR_RESERVAR_INODO;
-                        printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d para %s]\n", entrada.ninodo, tipo, permisos, entrada.nombre);
-                        printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);      
+                        //printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d para %s]\n", entrada.ninodo, tipo, permisos, entrada.nombre);
+                        //printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);      
                     }      
                     if(mi_write_f(*p_inodo_dir, &entrada, num_entrada_inodo*sizeof(struct entrada), sizeof(struct entrada)) == -1){
                         if(entrada.ninodo != -1){
@@ -240,7 +240,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
 
                     //Tamaño
                     memset(longitud, '\0', sizeof(longitud));
-                    sprintf(longitud, "%d", inodoAux.tamEnBytesLog);
+                    sprintf(longitud, "%d bytes", inodoAux.tamEnBytesLog);
                     strcat(buffer, longitud);
                     strcat(buffer, "\t\t");
 
@@ -289,7 +289,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
 
         //Tamaño
         memset(longitud, '\0', sizeof(longitud));
-        sprintf(longitud, "%d", inodo.tamEnBytesLog);
+        sprintf(longitud, "%d bytes", inodo.tamEnBytesLog);
         strcat(buffer, longitud);
         strcat(buffer, "\t\t");
         
@@ -450,6 +450,7 @@ int mi_link(const char *camino1, const char *camino2){
     return EXIT_SUCCESS;
     
 }
+
 /*
 Función de la capa de directorios que borra la entrada de directorio especificada (no hay que olvidar actualizar la cantidad de enlaces en el inodo) y, 
 en caso de que fuera el último enlace existente, borrar el propio fichero/directorio.
