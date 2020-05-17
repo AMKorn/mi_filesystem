@@ -23,7 +23,7 @@ int main(int argc, char **argv){
 
     int nbytes = mi_write(RUTA, buffer, OFFSET, tam);
 
-    printf("Número de bytes escritos: %d\n", nbytes);
+    printf("Bytes escritos: %d\n", nbytes);
 
     // Desontamos el disco
     if(bumount(DISCO)==-1) return EXIT_FAILURE;

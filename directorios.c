@@ -240,7 +240,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
 
                     //Tamaño
                     memset(longitud, '\0', sizeof(longitud));
-                    sprintf(longitud, "%d bytes", inodoAux.tamEnBytesLog);
+                    sprintf(longitud, "%d", inodoAux.tamEnBytesLog);
                     strcat(buffer, longitud);
                     strcat(buffer, "\t\t");
 
@@ -289,7 +289,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
 
         //Tamaño
         memset(longitud, '\0', sizeof(longitud));
-        sprintf(longitud, "%d bytes", inodo.tamEnBytesLog);
+        sprintf(longitud, "%d", inodo.tamEnBytesLog);
         strcat(buffer, longitud);
         strcat(buffer, "\t\t");
         

@@ -12,7 +12,7 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     leer_inodo(ninodo, &inodo);
     if((inodo.permisos & MASC_WRTE) != MASC_WRTE){
         fprintf(stderr, "El inodo no tiene permisos de escritura. Permisos: %d\n", inodo.permisos);
-        return -1;
+        return 0;
     }
 
     unsigned int primerBLogico = offset/BLOCKSIZE;

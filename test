@@ -1,4 +1,4 @@
 make
-./test8.sh
+./test9e1.sh
 rm disco
 make clean
