@@ -377,6 +377,29 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
     return mi_write_f(p_inodo, buf, offset, nbytes);
 }
 
+//Función de directorios.c para leer los nbytes del fichero indicado por camino, a partir del offset pasado por parámetro y copiarlos en un buffer. 
+int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nbytes){
+    unsigned int p_inodo_dir = 0;
+    unsigned int p_inodo = 0;
+    unsigned int p_entrada = 0;
+    unsigned char reservar = 0;
+    unsigned char permisos = 7; //No se que permisos ponerle, le pondré 7 de momento
+    int leidos;
+    int error;
+
+    if ((error = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos)) < 0) {
+    mostrar_error_buscar_entrada(error);
+    return EXIT_FAILURE;
+    } else {
+    leidos = mi_read_f(p_inodo, buf, offset, nbytes);
+    if(leidos==-1){
+        fprintf(stderr,"ERRORR; MI_READ_F");
+        return -1;
+    }
+    return leidos; 
+    }
+}
+
 int mi_link(const char *camino1, const char *camino2){
     unsigned int p_inodo_dir1, p_inodo_dir2, p_inodo1, p_inodo2, p_entrada1, p_entrada2;
     p_inodo_dir1=0;
