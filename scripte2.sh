@@ -87,7 +87,7 @@ echo "$ ./leer_sf disco"
 echo "######################################################################"
 echo "$ ./mi_escribir disco /dir1/dir11/fic111 "$(cat texto2.txt)" 0 #⊂ BL 0 ∈ D0"
 echo "#reservaremos 5 bloques de datos (3 escritos completos y 2 parciales)"
-./mi_escribir disco /dir1/dir11/fic111 "$(cat texto2.txt)" 0
+./mi_escribir disco /dir1/dir11/fic111 "$(cat texto.txt)" 0
 echo "$ ./leer_sf disco"
 ./leer_sf disco
 echo "$ ./mi_cat disco /dir1/dir11/fic111>ext1.txt"
