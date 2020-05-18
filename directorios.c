@@ -171,17 +171,19 @@ int mi_dir(const char *camino, char *buffer, char tipo){
     char longitud[TAMFILA];
     struct entrada entrada;
 
-    if (buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, 0, 6) < 0){
+    int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, 0, 6);
+    if (e < 0){
+        mostrar_error_buscar_entrada(e);
         return -1;
     }
 
     struct inodo inodo;
     if (leer_inodo(p_inodo, &inodo) == -1){
-        perror("Error al leer_inodo en mi_dir");
+        fprintf(stderr, "Error al leer_inodo en mi_dir");
         return -1;
     }
     if ((inodo.permisos & 4) != 4){
-        perror("Sin permisos de lectura");
+        fprintf(stderr, "Sin permisos de lectura");
         return -1;
     }
 
@@ -193,7 +195,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
         while (nentrada < maxEntradas){
             //leemos la entrada
             if (mi_read_f(p_inodo, &entrada, nentrada * sizeof(entrada), sizeof(entrada)) < 0){
-                perror("Error mi_read_f en mi_dir");
+                fprintf(stderr, "Error mi_read_f en mi_dir");
                 return EXIT_FAILURE;
             }
 
@@ -257,7 +259,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
         strcat(buffer, "\x1b[92mf\t");
 
         if (mi_read_f(p_inodo, &entrada, nentrada*sizeof(entrada), sizeof(entrada)) < 0) {
-            perror("Error mi_read_f en mi_dir");
+            fprintf(stderr, "Error mi_read_f en mi_dir");
             return EXIT_FAILURE;
         }
 
@@ -502,7 +504,7 @@ int mi_unlink(const char *camino){
         escribir_inodo(p_inodo, ino);
     }
     if (leer_inodo(p_inodo_dir, &ino) == -1) {
-        perror("Error al leer. No se pudo leer el inodo\n");
+        fprintf(stderr, "Error al leer. No se pudo leer el inodo\n");
         return -1;
     }
     nentradas = ((ino.tamEnBytesLog) / (sizeof(entrada)));

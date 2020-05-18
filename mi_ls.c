@@ -27,9 +27,11 @@ int main(int argc, char **argv){
         dir = mi_dir(camino, buffer, 'f');
     }
     
-    if(dir <= 0){
+    if(dir < 0){
         printf("Error: No existe el archivo o directorio\n");
         return EXIT_FAILURE;
+    } else if (dir==0){
+        printf("Total: %d\n", dir);
     } else {
         if(camino[strlen(camino)-1] == '/'){
             printf("Total: %d\n", dir);
