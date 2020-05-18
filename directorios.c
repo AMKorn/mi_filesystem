@@ -396,7 +396,7 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
     }
     leidos = mi_read_f(p_inodo, buf, offset, nbytes);
     if(leidos==-1){
-        fprintf(stderr,"ERRORR; MI_READ_F");
+        fprintf(stderr,"ERROR: MI_READ_F\n");
         return -1;
     }
     return leidos; 
@@ -404,7 +404,6 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
 
 int mi_link(const char *camino1, const char *camino2){
     
-    //HAY QUE TENER EN CUENTA: camino1 y camino2 han de referirse a un fichero!!!   Ruben -> (Creo que en uno de mis codigos hice algo parecido, si me acuerdo lo miro)
     unsigned int p_inodo_dir1, p_inodo_dir2, p_inodo1, p_inodo2, p_entrada1, p_entrada2;
     p_inodo_dir1=0;
     char reservar=0;
@@ -424,7 +423,7 @@ int mi_link(const char *camino1, const char *camino2){
     }
 
     p_inodo_dir2=0;
-    permisos=6;
+//    permisos=6;
     reservar=1;
     //Comprobamos que camino 2 no exista
     e = buscar_entrada(camino2, &p_inodo_dir2, &p_inodo2, &p_entrada2, reservar, permisos);
@@ -434,18 +433,36 @@ int mi_link(const char *camino1, const char *camino2){
         return EXIT_FAILURE;
     }
     //Leemos la entrada creada correspondiente a camino2, o sea la entrada p_entrada2 de p_inodo_dir2
-    mi_read_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
+    if(mi_read_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada))==-1){
+        fprintf(stderr, "Error en mi_link(): No se ha podido leer la entrada correspondiente a camino2.\n");
+        return EXIT_FAILURE;
+    }
     //Creamos el enlace: Asociamos a esta entrada el mismo inodo que el asociado a la entrada de camino1, es decir p_inodo1.
-    mi_write_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
+    if(mi_write_f(p_inodo2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada))==-1){
+        fprintf(stderr, "Error en mi_link(): No se ha podido asociar las entradas.\n");
+        return EXIT_FAILURE;
+    }
     //Escribimos la entrada modificada en p_inodo_dir2
-    escribir_inodo(p_inodo2, ino);
+    if(escribir_inodo(p_inodo2, ino)==EXIT_FAILURE){
+        fprintf(stderr, "Error en mi_link(): No se ha podido escribir la entrada modificada.\n");
+        return EXIT_FAILURE;
+    }
     //Liberamos el inodo que se ha asociado a la entrada creada, p_inodo2 
-    liberar_inodo(p_inodo2);
+    if(liberar_inodo(p_inodo2)==-1){
+        fprintf(stderr, "Error en mi_link(): No se ha podido liberar el inodo asociado.\n");
+        return EXIT_FAILURE;
+    }
     //Incrementamos la cantidad de enlaces de p_inodo1, actualizamos el ctime y lo salvamos
-    leer_inodo(p_inodo1, &ino);
+    if(leer_inodo(p_inodo1, &ino)==EXIT_FAILURE){
+        fprintf(stderr, "Error en mi_link(): No se ha podido leer el inodo enlazado para modificar sus datos.\n");
+        return EXIT_FAILURE;
+    }
     ino.nlinks++;
     ino.ctime = time (NULL);
-    escribir_inodo(p_inodo1, ino);
+    if(escribir_inodo(p_inodo1, ino)==EXIT_FAILURE){
+        fprintf(stderr, "Error en mi_link(): No se ha podido escribir el inodo enlazado para modificar sus datos.\n");
+        return EXIT_FAILURE;
+    }
     //FIN 
     return EXIT_SUCCESS;
     

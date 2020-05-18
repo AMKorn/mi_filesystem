@@ -566,7 +566,7 @@ int liberar_inodo(unsigned int ninodo){
    if(liberados == -1) return -1;
    inodo.numBloquesOcupados -= liberados;
    if(inodo.numBloquesOcupados != 0){
-      fprintf(stderr, "Error: liberar_bloques_inodo() no ha eliminado todos los bloques del inodo. \n");
+      fprintf(stderr, "Error: liberar_bloques_inodo() no ha eliminado todos los bloques del inodo.\nNúmero de bloques ocupados restantes: %d\nNúmero de inodos liberados: %d\n", inodo.numBloquesOcupados, liberados);
       return -1;
    }
    inodo.tipo = 'l';

@@ -89,12 +89,15 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
 int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsigned int nbytes){
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) < 0){
+        fprintf(stderr, "Error en mi_read_f: Error al leer el inodo.\n");
         return -1;
-    }
+    }/*
     if(escribir_inodo(ninodo, inodo) < 0){
+        fprintf(stderr, "Error en mi_read_f: Error al escribir el inodo.\n");
         return -1;
-    }
-    if((inodo.permisos & 4) != 4){
+    }*/
+    if((inodo.permisos & MASC_READ) != MASC_READ){
+        fprintf(stderr, "Error en mi_read_f: El fichero o directorio no tiene permisos de lectura.\n");
         return -1;
     }
 
