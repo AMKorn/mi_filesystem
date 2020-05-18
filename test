@@ -1,5 +1,6 @@
 make
 ./tests/test10e1.sh
 ./tests/test10e2.sh
+./tests/test10e3.sh
 rm disco
 make clean

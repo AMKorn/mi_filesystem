@@ -163,7 +163,7 @@ int mi_creat(const char *camino, unsigned char permisos){
     return EXIT_SUCCESS;
 }
 
-int mi_dir(const char *camino, char *buffer, char tipo){
+int mi_dir(const char *camino, char *buffer, char tipo){ 
     unsigned int p_inodo_dir = 0;
     unsigned int p_inodo = 0;
     unsigned int p_entrada = 0;
