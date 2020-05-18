@@ -12,3 +12,8 @@ Después de  ./truncar disco 1 409605001 hacer ./leer_sf disco
 		cantBloquesLibres = 96851
 	En cambio:
 		cantBloquesLibres = 96825
+		
+Mejoras futuras:
+1. Buscar_camino()[directorios.c], pasarlo a iterativo
+2. mi_touch
+3. Extra nivel 10
