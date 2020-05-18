@@ -2,6 +2,7 @@
 
 **GRUPO:** 
 Ino2
+
 **MIEMBROS:**
 Andreas Manuel Korn
 Sergio Vega García
