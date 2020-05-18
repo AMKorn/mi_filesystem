@@ -181,29 +181,34 @@ int mi_creat(const char *camino, unsigned char permisos){
  * @param tipo   - char que representa si es un directorio o un fichero.
  * @return       - El número de elementos en el directorio, o -1 si hay error.
  * */
-int mi_dir(const char *camino, char *buffer, char tipo){
+int mi_dir(const char *camino, char *buffer, char tipo){ 
     unsigned int p_inodo_dir = 0;
     unsigned int p_inodo = 0;
     unsigned int p_entrada = 0;
-
-    int e;
-
+    
     char longitud[TAMFILA];
     struct entrada entrada;
+    struct inodo inodo;
 
-    if ((e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, 0, 6)) < 0){
+    int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, 0, 6);
+    if (e < 0){
         mostrar_error_buscar_entrada(e);
-        return -1;
+        return EXIT_FAILURE;
     }
 
-    struct inodo inodo;
     if (leer_inodo(p_inodo, &inodo) == -1){
         fprintf(stderr, "Error al leer_inodo en mi_dir\n");
-        return -1;
+        return EXIT_FAILURE;
     }
+    //Comprobación permisos de lectura del inodo
     if ((inodo.permisos & MASC_READ) != MASC_READ){
         fprintf(stderr, "Sin permisos de lectura\n");
-        return -1;
+        return EXIT_FAILURE;
+    }
+    //Comprobación de que el tipo del inodo coincida con el del parametro
+    if(inodo.tipo != tipo){
+        fprintf(stderr, "Error: la sintaxis no concuerda con el tipo\n");
+        return EXIT_FAILURE;
     }
 
     int nentrada;
@@ -212,9 +217,9 @@ int mi_dir(const char *camino, char *buffer, char tipo){
         nentrada = 0;
         int maxEntradas = inodo.tamEnBytesLog / sizeof(entrada);;
         while (nentrada < maxEntradas){
-            //leemos la entrada
+            //Leemos la entrada
             if (mi_read_f(p_inodo, &entrada, nentrada * sizeof(entrada), sizeof(entrada)) < 0){
-                fprintf(stderr, "Error mi_read_f en mi_dir");
+                fprintf(stderr, "Error mi_read_f en mi_dir\n");
                 return EXIT_FAILURE;
             }
 
@@ -226,7 +231,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
                 }
 
                 if (inodoAux.tipo != 'l'){
-                    //Tipo
+                    //Color y tipo de fichero
                     if (inodoAux.tipo == 'd'){
                         strcat(buffer, "\x1b[91md\t");
                     } else if (inodoAux.tipo == 'f'){
@@ -273,12 +278,13 @@ int mi_dir(const char *camino, char *buffer, char tipo){
                 }
             }
         }
+    //Si es un fichero, obtenemos sus datos 
     } else if (tipo == 'f') {
         nentrada = 1;
-        strcat(buffer, "\x1b[92mf\t");
+        strcat(buffer, "\x1b[92mf\t");  //Color y tipo de fichero
 
         if (mi_read_f(p_inodo, &entrada, nentrada*sizeof(entrada), sizeof(entrada)) < 0) {
-            fprintf(stderr, "Error mi_read_f en mi_dir");
+            fprintf(stderr, "Error mi_read_f en mi_dir\n");
             return EXIT_FAILURE;
         }
 
@@ -410,7 +416,7 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
         int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
         if(e != EXIT_SUCCESS){
             mostrar_error_buscar_entrada(e);
-            return -1;
+            return EXIT_FAILURE;
         }
         // Actualizar caché
         strcpy(UltimaEntradaEscritura.camino, camino);
@@ -440,12 +446,12 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
         p_inodo = UltimaEntradaLectura.p_inodo;
     } else if ((error = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos)) < 0) {
         mostrar_error_buscar_entrada(error);
-        return -1;
+        return EXIT_FAILURE;
     }
     leidos = mi_read_f(p_inodo, buf, offset, nbytes);
     if(leidos==-1){
         fprintf(stderr,"ERROR: MI_READ_F\n");
-        return -1;
+        return EXIT_FAILURE;
     }
     return leidos; 
 }
@@ -544,47 +550,41 @@ int mi_unlink(const char *camino){
         return EXIT_FAILURE;
     }
 
-    //Si se trata de un directorio  y no está vacío (inodo.tamEnBytesLog > 0) entonces no se puede borrar y salimos de la función. En caso contrario:
-    //Mediante la función leer_inodo() leemos el inodo asociado al directorio que contiene la entrada que queremos eliminar (p_inodo_dir), 
-    //y obtenemos el nº de entradas que tiene (inodo_dir.tamEnBytesLog/sizeof(struct entrada))
-    if(leer_inodo(p_inodo,&ino));
-    if(ino.tipo != 'f') {
-        fprintf(stderr,"Camino ha de referirse a un directorio, no a un fichero");
+    if (leer_inodo(p_inodo, &ino) == -1) {
+        printf("Error (leer_inodo) . No se pudo leer el inodo\n");
+    }
+    //Si se trata de un directorio  y no está vacío (inodo.tamEnBytesLog > 0) entonces no se puede borrar y salimos de la función. 
+    if (ino.tipo == 'd' && ino.tamEnBytesLog > 0) {
+        printf("El directorio tiene archivos dentro, no se puede borrar\n");
         return EXIT_FAILURE;
     }
-    //Si la entrada a eliminar es la última (p_entrada ==nº entradas - 1), basta con truncar el inodo a su tamaño menos el tamaño de una entrada, mediante la función mi_truncar_f()
-    nentradas = ino.tamEnBytesLog/sizeof(struct entrada);
-    if (p_entrada == nentradas-1){
-        if (mi_truncar_f(p_inodo_dir, nentradas-sizeof(struct entrada))){
-            fprintf(stderr,"Error en truncar");
-            return EXIT_FAILURE;
-        }
-        //Si no es la última entrada, entonces tenemos que leer la última y colocarla en la posición de la entrada que queremos eliminar (p_entrada), 
-        //y después ya podemos truncar el inodo como en el caso anterior. 
-        //De esta manera siempre dejaremos las entradas de un directorio consecutivas para cuando tengamos que utilizar la función buscar_entrada()
-    } else {
-        if(mi_read_f(p_inodo_dir, &entrada, (nentradas-1) * sizeof(struct entrada), sizeof(struct entrada)) == -1) return -1;
-		if(mi_write_f(p_inodo_dir,&entrada, p_entrada*sizeof(struct entrada), sizeof(struct entrada)) == -1) return -1;
-        if (mi_truncar_f(p_inodo_dir,nentradas - sizeof(struct entrada))){
-            fprintf(stderr,"Error en truncar");
-            return EXIT_FAILURE;
-        }
-    }
-    //Leemos el inodo asociado a la entrada eliminada para decrementar el nº de enlaces
-    leer_inodo(p_inodo,&ino);
-        ino.nlinks--;
-    //Si no quedan enlaces (nlinks) entonces liberaremos el inodo, en caso contrario actualizamos su ctime y escribimos el inodo.
-    if(ino.nlinks < 1){
+    ino.nlinks--;
+    if (ino.nlinks < 1) {
         liberar_inodo(p_inodo);
     } else {
         ino.ctime = time(NULL);
-        if(escribir_inodo(p_inodo, ino) < 0){
-            fprintf(stderr,"Error al escribir inodo");
-            return EXIT_FAILURE; //Error ESCRIBIR_INODO
+        escribir_inodo(p_inodo, ino);
+    }
+    //Mediante la función leer_inodo() leemos el inodo asociado al directorio que contiene la entrada que queremos eliminar (p_inodo_dir), 
+    //y obtenemos el nº de entradas que tiene (inodo_dir.tamEnBytesLog/sizeof(struct entrada))
+    if (leer_inodo(p_inodo_dir, &ino) == -1) {
+        fprintf(stderr, "Error al leer. No se pudo leer el inodo\n");
+        return EXIT_FAILURE;
+    }
+    nentradas = ((ino.tamEnBytesLog) / (sizeof(entrada)));
+    //Si no es la última entrada, entonces tenemos que leer la última y colocarla en la posición de la entrada que queremos eliminar (p_entrada), 
+    //y después ya podemos truncar el inodo como en el caso anterior.
+    if (p_entrada != (nentradas - 1)) {
+        if (mi_read_f(p_inodo_dir, &entrada, ino.tamEnBytesLog - (sizeof(entrada)), sizeof(entrada)) == -1) {
+            return EXIT_FAILURE;
+        }
+        if (mi_write_f(p_inodo_dir, &entrada, p_entrada * sizeof(entrada), sizeof(entrada)) == -1) {
+            return EXIT_FAILURE;
         }
     }
+    if (mi_truncar_f(p_inodo_dir, ino.tamEnBytesLog - (sizeof(entrada))) == -1) {
+        return EXIT_FAILURE;
+    }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
-
-
