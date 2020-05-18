@@ -13,6 +13,7 @@ Rubén López Babón
 	** Incluir el inodo que queremos liberar en la lista de inodos libres (por el principio), actualizando el superbloque para que éste sea ahora el primero de la lista. El inodo liberado apuntará donde antes apuntaba el campo del superbloque. 
 	
 //Creo que ya no persiste:
+
 Después de  ./truncar disco 1 409605001 hacer ./leer_sf disco 
 	Debería:
 		cantBloquesLibres = 96851
