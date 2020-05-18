@@ -28,7 +28,6 @@ int main(int argc, char **argv){
     }
     
     if(dir < 0){
-        printf("Error: No existe el archivo o directorio\n");
         return EXIT_FAILURE;
     } else if (dir==0){
         printf("Total: %d\n", dir);

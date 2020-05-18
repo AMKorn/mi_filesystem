@@ -193,22 +193,22 @@ int mi_dir(const char *camino, char *buffer, char tipo){
     int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, 0, 6);
     if (e < 0){
         mostrar_error_buscar_entrada(e);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     if (leer_inodo(p_inodo, &inodo) == -1){
         fprintf(stderr, "Error al leer_inodo en mi_dir\n");
-        return EXIT_FAILURE;
+        return -1;
     }
     //Comprobación permisos de lectura del inodo
     if ((inodo.permisos & MASC_READ) != MASC_READ){
         fprintf(stderr, "Sin permisos de lectura\n");
-        return EXIT_FAILURE;
+        return -1;
     }
     //Comprobación de que el tipo del inodo coincida con el del parametro
     if(inodo.tipo != tipo){
         fprintf(stderr, "Error: la sintaxis no concuerda con el tipo\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     int nentrada;
@@ -220,14 +220,14 @@ int mi_dir(const char *camino, char *buffer, char tipo){
             //Leemos la entrada
             if (mi_read_f(p_inodo, &entrada, nentrada * sizeof(entrada), sizeof(entrada)) < 0){
                 fprintf(stderr, "Error mi_read_f en mi_dir\n");
-                return EXIT_FAILURE;
+                return -1;
             }
 
             if (entrada.ninodo >= 0){
 
                 struct inodo inodoAux;
                 if (leer_inodo(entrada.ninodo, &inodoAux) == -1){
-                    return EXIT_FAILURE;
+                    return -1;
                 }
 
                 if (inodoAux.tipo != 'l'){
@@ -285,7 +285,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
 
         if (mi_read_f(p_inodo, &entrada, nentrada*sizeof(entrada), sizeof(entrada)) < 0) {
             fprintf(stderr, "Error mi_read_f en mi_dir\n");
-            return EXIT_FAILURE;
+            return -1;
         }
 
         //Permisos
