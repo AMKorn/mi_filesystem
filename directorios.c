@@ -416,31 +416,32 @@ int mi_link(const char *camino1, const char *camino2){
     int ninodo1 = p_inodo;
     struct inodo inodo;
     if (leer_inodo(ninodo1, &inodo) == -1) {
-        printf("Error (mi_link) . No se pudo leer el inodo\n");
+        printf("Error en mi_link(): No se pudo leer el inodo\n");
         return -1;
     }
     if ((inodo.permisos & 4) != 4) {
         return ERROR_PERMISO_LECTURA;
     }
-    //camino1 ha de referirse a un fichero!!! No se permite el enlace a directorios para evitar que se creen ciclos en el grafo
+
+    //Comprobamos que camino1 se refiere a un fichero.
     if (inodo.tipo != 'f') {
-        printf("Error (mi_link) no es un fichero\n");
+        printf("Error en mi_link(): Camino 1 debe ser un fichero existente.\n");
         return -1;
     }
 
-    // inicializamos los parámetros para buscar caminoAux
+    // Volvemos a inicializar los parámetros para buscar caminoAux
     p_inodo_dir = 0;
     p_inodo = 0;
     p_entrada = 0;
 
     if (buscar_entrada(camino2, &p_inodo_dir, &p_inodo, &p_entrada, 1, 6) == ERROR_ENTRADA_YA_EXISTENTE) {
-        printf("Error (mi_link) la entrada ya existe \n");
+        printf("Error en mi_link(): La entrada ya existe \n");
         return EXIT_FAILURE;
     }
 
     //Leemos la entrada creada
     if (mi_read_f(p_inodo_dir, &entrada, (p_entrada) * sizeof(entrada), sizeof(entrada)) == -1) {
-        printf("Error (mi_link) en leer la entrada %d\n", p_entrada);
+        printf("Error en mi_link(): Error al leer la entrada %d\n", p_entrada);
         return -1;
     }
 
@@ -449,7 +450,7 @@ int mi_link(const char *camino1, const char *camino2){
     entrada.ninodo = ninodo1;
 
     if (mi_write_f(p_inodo_dir, &entrada, (p_entrada) * sizeof(entrada), sizeof(entrada)) < 0) {
-        printf("Error (mi_link) en escribir la entrada modificada\n");
+        printf("Error en mi_link(): Error al escribir la entrada modificada\n");
         return -1;
     }
 
@@ -458,7 +459,7 @@ int mi_link(const char *camino1, const char *camino2){
     inodo.ctime = time(NULL);
 
     if (escribir_inodo(ninodo1, inodo) == -1) {
-        printf("Error (mi_link) en escribir el inodo\n");
+        printf("Error en mi_link(): Error al escribir el inodo\n");
         return -1;
     }
     
