@@ -426,7 +426,7 @@ int mi_link(const char *camino1, const char *camino2){
 //    permisos=6;
     reservar=1;
     //Comprobamos que camino 2 no exista
-    e = buscar_entrada(camino2, &p_inodo_dir2, &p_inodo2, &p_entrada2, reservar, permisos);
+    e = buscar_entrada(camino2, &p_inodo_dir1, &p_inodo1, &p_entrada1, reservar, permisos);
     //Se crea en escritura y ha de devolver error en caso de que la entrada no exista.
     if(e != EXIT_SUCCESS && e != ERROR_ENTRADA_YA_EXISTENTE){
         mostrar_error_buscar_entrada(e);
@@ -472,7 +472,6 @@ int mi_link(const char *camino1, const char *camino2){
 Función de la capa de directorios que borra la entrada de directorio especificada (no hay que olvidar actualizar la cantidad de enlaces en el inodo) y, 
 en caso de que fuera el último enlace existente, borrar el propio fichero/directorio.
 */
-
 int mi_unlink(const char *camino){
 
     unsigned int p_inodo_dir, p_inodo, p_entrada, nentradas;
@@ -530,3 +529,4 @@ int mi_unlink(const char *camino){
     }
     return EXIT_SUCCESS;
 }
+
