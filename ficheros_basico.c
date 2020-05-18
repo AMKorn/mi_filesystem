@@ -411,7 +411,11 @@ int reservar_inodo(unsigned char tipo, unsigned char permisos){
 //Nivel4
 
 /**
- * Obtiene el rango de punteros en el que se sitúa el bloque lógico
+ * Función que obtiene el rango de punteros en el que se sitúa el bloque lógico.
+ * @param inodo      - struct inodo cuyo rango se quiere obtener
+ * @param nblogico   - unsigned int que indica el bloque lógico
+ * @param ptr        - unsigned int[] que indicará los punteros indirectos del inodo.
+ * @return           - el rango del bloque lógico, o -1 si hay un error.
  */
 int obtener_nrangoBL (struct inodo inodo,  unsigned int nblogico, unsigned int *ptr) { //devolver nrangoBL:ent 
    if (nblogico<DIRECTOS){
@@ -433,12 +437,15 @@ int obtener_nrangoBL (struct inodo inodo,  unsigned int nblogico, unsigned int *
    else {
       *ptr=0;               
       perror("Bloque lógico fuera de rango");         
-      return EXIT_FAILURE; 
+      return -1; 
    } 
 }
 
 /**
- * Obtención de los índices de los bloques de punteros
+ * Función que obtiene los índices de los bloques de punteros.
+ * @param nblogico         - unsigned int que indica el número del bloque lógico cuyo índice se quiere obtener.
+ * @param nivel_punteros   - unsigned int que ineica el nivel de los punteros.
+ * @return                 - los índices de los bloques de punteros, o -1 si hay error.
  */
 int obtener_indice(unsigned int nblogico, unsigned int nivel_punteros){
    //Caso 1: Dentro de punteros directos
@@ -471,7 +478,7 @@ int obtener_indice(unsigned int nblogico, unsigned int nivel_punteros){
       }  
    }
    //ERROR
-   return EXIT_FAILURE;             
+   return -1;             
 }
 
 /**

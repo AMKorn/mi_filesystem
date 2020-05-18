@@ -85,17 +85,18 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
 
 /**
  * Lee información de un fichero/directorio correspondiente al nº de inodo pasado como argumento y la almacena en un buffer de memoria.
+ * @param ninodo        - unsigned int en el que se indica el número de inodo a leer
+ * @param buf_original  - void[] en el que almacenar la información a leer
+ * @param offset        - unsigned int que indica el offset en número de bytes a partir del cual leer.
+ * @param nbytes        - unsigned int que indica la cantidad de bytes a leer.
+ * @return el número de bytes leídos, o -1 si hay un error.
  */
 int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsigned int nbytes){
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) < 0){
         fprintf(stderr, "Error en mi_read_f: Error al leer el inodo.\n");
         return -1;
-    }/*
-    if(escribir_inodo(ninodo, inodo) < 0){
-        fprintf(stderr, "Error en mi_read_f: Error al escribir el inodo.\n");
-        return -1;
-    }*/
+    }
     if((inodo.permisos & MASC_READ) != MASC_READ){
         fprintf(stderr, "Error en mi_read_f: El fichero o directorio no tiene permisos de lectura.\n");
         return -1;
@@ -225,7 +226,7 @@ int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
     return EXIT_SUCCESS;
 }
 
- // Nivel 6
+// Nivel 6
 
 /**
  * Trunca un fichero/directorio a los bytes indicados y liberando los bloques necesarios.

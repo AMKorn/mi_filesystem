@@ -1,6 +1,6 @@
-#include <string.h>
 #include "ficheros.h"
 
+// Posibles errores de la función buscar_entrada().
 #define ERROR_CAMINO_INCORRECTO -1
 #define ERROR_PERMISO_LECTURA -2
 #define ERROR_NO_EXISTE_ENTRADA_CONSULTA -3
@@ -21,6 +21,9 @@ struct entrada {
     unsigned int ninodo;
 };
 
+/**
+ * Struct utilizado para almacenar las últimas entradas de lectura y de escritura en caché, y así optimizar las lecturas y escrituras.
+ * */
 struct UltimaEntrada{
     char camino [512];
     int p_inodo;
