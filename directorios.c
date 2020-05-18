@@ -486,7 +486,7 @@ int mi_link(const char *camino1, const char *camino2){
 
     //Comprobamos que camino1 se refiere a un fichero.
     if (inodo.tipo != 'f') {
-        printf("Error en mi_link(): Camino 1 debe ser un fichero existente.\n");
+        printf("Error: No existe el archivo o el directorio.\n");
         return EXIT_FAILURE;
     }
 
@@ -496,7 +496,7 @@ int mi_link(const char *camino1, const char *camino2){
     p_entrada = 0;
 
     if (buscar_entrada(camino2, &p_inodo_dir, &p_inodo, &p_entrada, 1, 6) == ERROR_ENTRADA_YA_EXISTENTE) {
-        printf("Error en mi_link(): La entrada ya existe \n");
+        printf("Error: El archivo ya existe.\n");
         return EXIT_FAILURE;
     }
 
@@ -554,7 +554,7 @@ int mi_unlink(const char *camino){
     }
     //Si se trata de un directorio  y no está vacío (inodo.tamEnBytesLog > 0) entonces no se puede borrar y salimos de la función. 
     if (ino.tipo == 'd' && ino.tamEnBytesLog > 0) {
-        printf("El directorio tiene archivos dentro, no se puede borrar\n");
+        printf("Error: El directorio %s no está vacío\n", camino);
         return EXIT_FAILURE;
     }
     ino.nlinks--;
