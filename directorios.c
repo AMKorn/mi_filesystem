@@ -544,7 +544,6 @@ int mi_unlink(const char *camino){
         return EXIT_FAILURE;
     }
 
-<<<<<<< HEAD
     //Si se trata de un directorio  y no está vacío (inodo.tamEnBytesLog > 0) entonces no se puede borrar y salimos de la función. En caso contrario:
     //Mediante la función leer_inodo() leemos el inodo asociado al directorio que contiene la entrada que queremos eliminar (p_inodo_dir), 
     //y obtenemos el nº de entradas que tiene (inodo_dir.tamEnBytesLog/sizeof(struct entrada))
@@ -583,38 +582,6 @@ int mi_unlink(const char *camino){
             fprintf(stderr,"Error al escribir inodo");
             return EXIT_FAILURE; //Error ESCRIBIR_INODO
         }
-=======
-    if (leer_inodo(p_inodo, &ino) == -1) {
-        printf("Error (leer_inodo) . No se pudo leer el inodo\n");
-    }
-    if (ino.tipo == 'd' && ino.tamEnBytesLog > 0) {
-        printf("El directorio tiene archivos dentro, no se puede borrar\n");
-        return -1;
-    }
-    ino.nlinks--;
-    if (ino.nlinks < 1) {
-        liberar_inodo(p_inodo);
-    } else {
-        ino.ctime = time(NULL);
-        escribir_inodo(p_inodo, ino);
-    }
-    if (leer_inodo(p_inodo_dir, &ino) == -1) {
-        fprintf(stderr, "Error al leer. No se pudo leer el inodo\n");
-        return -1;
-    }
-    nentradas = ((ino.tamEnBytesLog) / (sizeof(entrada)));
-    if (p_entrada != (nentradas - 1)) {
-
-        if (mi_read_f(p_inodo_dir, &entrada, ino.tamEnBytesLog - (sizeof(entrada)), sizeof(entrada)) == -1) {
-            return -1;
-        }
-        if (mi_write_f(p_inodo_dir, &entrada, p_entrada * sizeof(entrada), sizeof(entrada)) == -1) {
-            return -1;
-        }
-    }
-    if (mi_truncar_f(p_inodo_dir, ino.tamEnBytesLog - (sizeof(entrada))) == -1) {
-        return -1;
->>>>>>> e8360d1b1f0eff2b91b834bcf8be609080d9caa9
     }
 
     return 0;
