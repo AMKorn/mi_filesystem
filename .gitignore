@@ -70,3 +70,9 @@ mi_mkdir
 mi_stat
 prueba_nivel_7
 truncar 
+mi_cat
+mi_escribir
+mi_escribir_varios
+mi_link
+mi_ls
+mi_rm

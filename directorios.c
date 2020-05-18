@@ -423,10 +423,10 @@ int mi_link(const char *camino1, const char *camino2){
     }
 
     p_inodo_dir2=0;
-//    permisos=6;
+    permisos=6;
     reservar=1;
     //Comprobamos que camino 2 no exista
-    e = buscar_entrada(camino2, &p_inodo_dir1, &p_inodo1, &p_entrada1, reservar, permisos);
+    e = buscar_entrada(camino2, &p_inodo_dir2, &p_inodo2, &p_entrada2, reservar, permisos);
     //Se crea en escritura y ha de devolver error en caso de que la entrada no exista.
     if(e != EXIT_SUCCESS && e != ERROR_ENTRADA_YA_EXISTENTE){
         mostrar_error_buscar_entrada(e);
