@@ -522,8 +522,7 @@ int mi_link(const char *camino1, const char *camino2){
 }
 
 /**
- * Función de la capa de directorios que borra la entrada de directorio especificada (no hay que olvidar actualizar la cantidad de enlaces en el inodo) y, 
- * en caso de que fuera el último enlace existente, borrar el propio fichero/directorio.
+ * Función para borrar la entrada a un directorio (no vacio) o fichero
  * @param camino    - const char[] que incluye el camino a borrar.
  * @return          - EXIT_SUCCESS o EXIT_FAILURE
  * */
