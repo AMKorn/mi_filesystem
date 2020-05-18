@@ -472,10 +472,12 @@ en caso de que fuera el último enlace existente, borrar el propio fichero/direc
 */
 int mi_unlink(const char *camino){
 
-    unsigned int p_inodo_dir, p_inodo, p_entrada, nentradas;
-    p_inodo_dir=0;
+    unsigned int p_inodo_dir = 0;
+    unsigned int p_inodo = 0;
+    unsigned int p_entrada = 0;
+    unsigned int nentradas;
     char reservar=0;
-    char permisos=7;
+    char permisos=6;
     struct inodo ino;
     struct entrada entrada;
 
@@ -490,41 +492,42 @@ int mi_unlink(const char *camino){
     //Mediante la función leer_inodo() leemos el inodo asociado al directorio que contiene la entrada que queremos eliminar (p_inodo_dir), 
     //y obtenemos el nº de entradas que tiene (inodo_dir.tamEnBytesLog/sizeof(struct entrada))
     if(leer_inodo(p_inodo,&ino));
-    if(ino.tipo != 'f') {
-        fprintf(stderr,"Camino ha de referirse a un directorio, no a un fichero");
+    if(ino.tipo == 'd' && ino.tamEnBytesLog>0) {
+        fprintf(stderr,"El directorio no esta vacio, no se puede borrar\n");
         return -1;
     }
     //Si la entrada a eliminar es la última (p_entrada ==nº entradas - 1), basta con truncar el inodo a su tamaño menos el tamaño de una entrada, mediante la función mi_truncar_f()
-    nentradas = ino.tamEnBytesLog/sizeof(struct entrada);
+    nentradas = ((ino.tamEnBytesLog)/(sizeof(struct entrada)));
     if (p_entrada == nentradas-1){
-        if (mi_truncar_f(p_inodo_dir, nentradas-sizeof(struct entrada))){
-            fprintf(stderr,"Error en truncar");
+        if(mi_truncar_f(p_inodo_dir,ino.tamEnBytesLog - sizeof(struct entrada))==-1){
+            fprintf(stderr,"1.Error en truncar\n");
             return -1;
         }
         //Si no es la última entrada, entonces tenemos que leer la última y colocarla en la posición de la entrada que queremos eliminar (p_entrada), 
         //y después ya podemos truncar el inodo como en el caso anterior. 
         //De esta manera siempre dejaremos las entradas de un directorio consecutivas para cuando tengamos que utilizar la función buscar_entrada()
     } else {
-        if(mi_read_f(p_inodo_dir, &entrada, (nentradas-1) * sizeof(struct entrada), sizeof(struct entrada)) == -1) return -1;
-		if(mi_write_f(p_inodo_dir,&entrada, p_entrada*sizeof(struct entrada), sizeof(struct entrada)) == -1) return -1;
-        if (mi_truncar_f(p_inodo_dir,nentradas - sizeof(struct entrada))){
-            fprintf(stderr,"Error en truncar");
+        if(mi_read_f(p_inodo_dir, &entrada, ino.tamEnBytesLog-(sizeof(struct entrada)), sizeof(struct entrada)) == -1) return -1;
+		if(mi_write_f(p_inodo_dir,&entrada, p_entrada*(sizeof(struct entrada)), sizeof(struct entrada)) == -1) return -1;
+        if(mi_truncar_f(p_inodo_dir,ino.tamEnBytesLog - (sizeof(struct entrada)))==-1){
+            fprintf(stderr,"2.Error en truncar\n");
             return -1;
         }
     }
     //Leemos el inodo asociado a la entrada eliminada para decrementar el nº de enlaces
     leer_inodo(p_inodo,&ino);
-        ino.nlinks--;
+    ino.nlinks--;
     //Si no quedan enlaces (nlinks) entonces liberaremos el inodo, en caso contrario actualizamos su ctime y escribimos el inodo.
     if(ino.nlinks < 1){
         liberar_inodo(p_inodo);
     } else {
         ino.ctime = time(NULL);
         if(escribir_inodo(p_inodo, ino) < 0){
-            fprintf(stderr,"Error al escribir inodo");
+            fprintf(stderr,"Error al escribir inodo\n");
             return -1; //Error ESCRIBIR_INODO
         }
     }
     return EXIT_SUCCESS;
 }
+
 
