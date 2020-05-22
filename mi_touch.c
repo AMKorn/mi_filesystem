@@ -10,13 +10,13 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
 
-    // Montamos el disco
-    if(bmount(DISCO)==-1) return EXIT_FAILURE;
-
     if(RUTA[strlen(RUTA)-1] == '/'){
         fprintf(stderr, "mi_touch no puede crear directorios\n");
         return EXIT_FAILURE;
     }
+
+    // Montamos el disco
+    if(bmount(DISCO)==-1) return EXIT_FAILURE;
 
     unsigned char permisos = PERMISOS;
     if(permisos > 7){
