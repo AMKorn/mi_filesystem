@@ -187,6 +187,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
     unsigned int p_entrada = 0;
     
     char longitud[TAMFILA];
+    memset(longitud, 0, sizeof(longitud));
     struct entrada entrada;
     struct inodo inodo;
 
