@@ -1,12 +1,19 @@
 #include "directorios.h"
 
+#define DISCO argv[1]
+#define FICHERO argv[2]
+#define INODOS atoi(argv[3])
+#define MODO argv[4]
+
+
+//2 modos (-t, directamente desde consola y -f, lectura desde fichero)
 int main(int argc, char **argv){
 
     int offsets[5]={9000,209000,30725000,409605000,480000000};
 
     //Comprobamos la sintaxis
-    if(argc != 4){
-		fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <\"$(cat fichero)\"> <diferentes_inodos>\n");
+    if(argc != 5){
+		fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <texto|ruta_fichero> <diferentes_inodos> <modo>\n");
         fprintf(stderr,"Offsets:");
         for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
             fprintf(stderr," %d,",offsets[j]);
@@ -15,17 +22,18 @@ int main(int argc, char **argv){
 		return -1;
  	}
 
+    if(MODO[1]!='f' && MODO[1]!='t'){
+        fprintf(stderr, "Modo introducido invalido, modos validos: -f(lectura desde fichero), -t(lectura desde consola)\n");
+        return EXIT_FAILURE;
+    }
+
     //Montamos el disco
-    if(bmount(argv[1])==-1) {
+    if(bmount(DISCO)==-1) {
         fprintf(stderr, "Error de montaje de disco.\n");
         return EXIT_FAILURE;
     }
 
     //Inicializamos las variables
-    int tam = strlen(argv[2]);
-    char buffer[tam];
-    memset(buffer,0,tam);
-    strcpy(buffer,argv[2]);
     int escritos;
     int ninodo;
     //if(ninodo==-1) return EXIT_FAILURE;
@@ -36,63 +44,137 @@ int main(int argc, char **argv){
     char mtime[80];
     char ctime[80];
 
-    //Iniciamos la escritura
-    printf("Offsets:");
-    for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
-        printf(" %d,",offsets[j]);
-    }
-    printf("\nLongitud texto: %d\n\n", tam);
-
-    //Un mismo inodo
-    int diferentes_inodos = atoi(argv[3]);
-    /*
-    if(atoi(argv[3])==0){
-        ninodo= reservar_inodo('f',6);
-    }
-    */
-    for(int i = 0; i<(sizeof(offsets)/sizeof(offsets[0])); i++){
-        //Si diferentes_inodo vale 1, reservaremos un nuevo inodo en cada iteracion
-        if (diferentes_inodos || i == 0){
-            ninodo = reservar_inodo('f',6);
+    if(MODO[1]=='f'){        
+        char *buffer;
+        long tam;
+        FILE *f = fopen(FICHERO, "rb");
+        fseek (f, 0, SEEK_END);
+        tam = ftell(f);
+        fseek (f, 0, SEEK_SET);
+        buffer = (char*)malloc ((tam+1)*sizeof(char));
+        if(buffer){
+            fread(buffer, sizeof(char), tam, f);
         }
+        fclose (f);
+
+        //Iniciamos la escritura
+        printf("Offsets:");
+        for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
+            printf(" %d,",offsets[j]);
+        }
+        printf("\nLongitud texto: %ld\n\n", tam);
+
+        //Un mismo inodo
+        int diferentes_inodos = INODOS;
         /*
-        if(atoi(argv[3])==1){
-            ninodo = reservar_inodo('f',6);
+        if(INODOS==0){
+            ninodo= reservar_inodo('f',6);
         }
         */
-        escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
-        if(escritos==-1) {
-            fprintf(stderr,"Error durante la escritura.\n");
-            return EXIT_FAILURE;
-        }
-        if(mi_stat_f(ninodo, &st)== -1) {
-            fprintf(stderr,"Error en mi_stat_f.\n");
-            return EXIT_FAILURE;
-        }
-        ts = localtime(&st.atime);
-        strftime(atime, sizeof(atime), "%a %Y-%m-%d %H:%M:%S", ts);
-        ts = localtime(&st.mtime);
-        strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
-        ts = localtime(&st.ctime);
-        strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
+        for(int i = 0; i<(sizeof(offsets)/sizeof(offsets[0])); i++){
+            //Si diferentes_inodo vale 1, reservaremos un nuevo inodo en cada iteracion
+            if (diferentes_inodos || i == 0){
+                ninodo = reservar_inodo('f',6);
+            }
+            /*
+            if(INODOS==1){
+                ninodo = reservar_inodo('f',6);
+            }
+            */
+            escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
+            if(escritos==-1) {
+                fprintf(stderr,"Error durante la escritura.\n");
+                return EXIT_FAILURE;
+            }
+            if(mi_stat_f(ninodo, &st)== -1) {
+                fprintf(stderr,"Error en mi_stat_f.\n");
+                return EXIT_FAILURE;
+            }
+            ts = localtime(&st.atime);
+            strftime(atime, sizeof(atime), "%a %Y-%m-%d %H:%M:%S", ts);
+            ts = localtime(&st.mtime);
+            strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
+            ts = localtime(&st.ctime);
+            strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
 
-        //Imprimimos resultados
-        fprintf(stderr,"Nº Inodo reservado: %d\n", ninodo);
-        fprintf(stderr,"Offset: %d\n", offsets[i]);
-        fprintf(stderr,"Bytes escritos: %d\n", escritos);
-        fprintf(stderr,"DATOS INODO %d:\n...\n", ninodo);
-	    fprintf(stderr,"Tipo=%c\n", st.tipo);
-        fprintf(stderr,"Permisos=%d\n", st.permisos);
-        fprintf(stderr,"Atime: %s\n", atime);
-        fprintf(stderr,"Mtime: %s\n", mtime);
-        fprintf(stderr,"Ctime: %s\n", ctime);
-        fprintf(stderr,"nlinks=%d\n", st.nlinks);
-        fprintf(stderr,"TamBytesLogicos: %d\n", st.tamEnBytesLog);
-        fprintf(stderr,"NumBloquesOcupados: %d\n\n\n", st.numBloquesOcupados);
+            //Imprimimos resultados
+            fprintf(stderr,"Nº Inodo reservado: %d\n", ninodo);
+            fprintf(stderr,"Offset: %d\n", offsets[i]);
+            fprintf(stderr,"Bytes escritos: %d\n", escritos);
+            fprintf(stderr,"DATOS INODO %d:\n...\n", ninodo);
+            fprintf(stderr,"Tipo=%c\n", st.tipo);
+            fprintf(stderr,"Permisos=%d\n", st.permisos);
+            fprintf(stderr,"Atime: %s\n", atime);
+            fprintf(stderr,"Mtime: %s\n", mtime);
+            fprintf(stderr,"Ctime: %s\n", ctime);
+            fprintf(stderr,"nlinks=%d\n", st.nlinks);
+            fprintf(stderr,"TamBytesLogicos: %d\n", st.tamEnBytesLog);
+            fprintf(stderr,"NumBloquesOcupados: %d\n\n\n", st.numBloquesOcupados);
+        }
+    } else if(MODO[1]=='t'){
+        long tam = strlen(FICHERO);
+        char buffer[tam];
+        memset(buffer, 0, tam);
+        strcpy(buffer, FICHERO);
+
+        //Iniciamos la escritura
+        printf("Offsets:");
+        for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
+            printf(" %d,",offsets[j]);
+        }
+        printf("\nLongitud texto: %ld\n\n", tam);
+
+        //Un mismo inodo
+        int diferentes_inodos = INODOS;
+        /*
+        if(INODOS==0){
+            ninodo= reservar_inodo('f',6);
+        }
+        */
+        for(int i = 0; i<(sizeof(offsets)/sizeof(offsets[0])); i++){
+            //Si diferentes_inodo vale 1, reservaremos un nuevo inodo en cada iteracion
+            if (diferentes_inodos || i == 0){
+                ninodo = reservar_inodo('f',6);
+            }
+            /*
+            if(INODOS==1){
+                ninodo = reservar_inodo('f',6);
+            }
+            */
+            escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
+            if(escritos==-1) {
+                fprintf(stderr,"Error durante la escritura.\n");
+                return EXIT_FAILURE;
+            }
+            if(mi_stat_f(ninodo, &st)== -1) {
+                fprintf(stderr,"Error en mi_stat_f.\n");
+                return EXIT_FAILURE;
+            }
+            ts = localtime(&st.atime);
+            strftime(atime, sizeof(atime), "%a %Y-%m-%d %H:%M:%S", ts);
+            ts = localtime(&st.mtime);
+            strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
+            ts = localtime(&st.ctime);
+            strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
+
+            //Imprimimos resultados
+            fprintf(stderr,"Nº Inodo reservado: %d\n", ninodo);
+            fprintf(stderr,"Offset: %d\n", offsets[i]);
+            fprintf(stderr,"Bytes escritos: %d\n", escritos);
+            fprintf(stderr,"DATOS INODO %d:\n...\n", ninodo);
+            fprintf(stderr,"Tipo=%c\n", st.tipo);
+            fprintf(stderr,"Permisos=%d\n", st.permisos);
+            fprintf(stderr,"Atime: %s\n", atime);
+            fprintf(stderr,"Mtime: %s\n", mtime);
+            fprintf(stderr,"Ctime: %s\n", ctime);
+            fprintf(stderr,"nlinks=%d\n", st.nlinks);
+            fprintf(stderr,"TamBytesLogicos: %d\n", st.tamEnBytesLog);
+            fprintf(stderr,"NumBloquesOcupados: %d\n\n\n", st.numBloquesOcupados);
+        }
     }
     
     //Desmontamos el disco
-    if(bumount(argv[1])==-1) {
+    if(bumount(DISCO)==-1) {
         fprintf(stderr, "Error al desmontar el disco.\n");
         return EXIT_FAILURE;
     }
