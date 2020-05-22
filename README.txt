@@ -20,8 +20,29 @@ Después de  ./truncar disco 1 409605001 hacer ./leer_sf disco
 	En cambio:
 		cantBloquesLibres = 96825
 		
-**Mejoras futuras:**
+**Mejoras**
+*Realizadas*
+- mi_read y mi_write con cache
+- Elegir formato de salida en mi_ls
+- mi_touch
+- mi_rmdir
+- Lectura de ficheros externos de escribir.c
+
+*Pendientes*
+- Nos queda:
+- mejoras liberar_bloques_inodo()
+- mejora init_MB()
+- SB memoria compartida
+- buffer conjunto entradas en buscar_entrada()
+- mi_rmdir_r
+- mi_rn
+- mi_mv
+- mi_cp_f
+- mi_cp
+
+-----------------------------------------------------------------------------------------------------------
 1. Buscar_camino()[directorios.c], pasarlo a iterativo
 2. mi_touch
 3. Extra nivel 10
 4. liberar_bloques_inodo es muy ineficiente, habria que mirar la manera de mejorarlo para la entrega final
+-------------------------------------------------------------------------------------------------------------
