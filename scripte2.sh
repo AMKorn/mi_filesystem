@@ -61,7 +61,7 @@ echo "$ ./mi_ls disco /"
 echo "$ ./mi_stat disco /dir1/"
 ./mi_stat disco /dir1/
 echo "$ ./mi_ls disco /dir1/"
-./mi_ls disco /dir1/ 
+./mi_ls disco /dir1/
 echo "$ ./mi_stat disco /dir1/dir11/"
 ./mi_stat disco /dir1/dir11/
 echo "$ ./mi_ls disco /dir1/dir11/"

@@ -181,7 +181,7 @@ int mi_creat(const char *camino, unsigned char permisos){
  * @param tipo   - char que representa si es un directorio o un fichero.
  * @return       - El número de elementos en el directorio, o -1 si hay error.
  * */
-int mi_dir(const char *camino, char *buffer, char tipo){ 
+int mi_dir(const char *camino, char *buffer, char tipo, char formato){ 
     unsigned int p_inodo_dir = 0;
     unsigned int p_inodo = 0;
     unsigned int p_entrada = 0;
@@ -239,37 +239,39 @@ int mi_dir(const char *camino, char *buffer, char tipo){
                         strcat(buffer, "\x1b[92mf\t");
                     }
 
-                    //Permisos
-                    if (inodoAux.permisos & 4){
-                        strcat(buffer, "r");
-                    } else {
-                        strcat(buffer, "-");
-                    }
-                    if (inodoAux.permisos & 2){
-                        strcat(buffer, "w");
-                    } else {
-                        strcat(buffer, "-");
-                    }
-                    if (inodoAux.permisos & 1){
-                        strcat(buffer, "x");
-                    } else {
-                        strcat(buffer, "-");
-                    }
-                    strcat(buffer, "\t\t");
+                    if(formato=='e'){
+                        //Permisos
+                        if (inodoAux.permisos & MASC_READ){
+                            strcat(buffer, "r");
+                        } else {
+                            strcat(buffer, "-");
+                        }
+                        if (inodoAux.permisos & MASC_WRTE){
+                            strcat(buffer, "w");
+                        } else {
+                            strcat(buffer, "-");
+                        }
+                        if (inodoAux.permisos & MASC_EXEC){
+                            strcat(buffer, "x");
+                        } else {
+                            strcat(buffer, "-");
+                        }
+                        strcat(buffer, "\t\t");
 
-                    //mTime
-                    struct tm *ts;
-                    char mtime[TAMFILA];
-                    ts = localtime(&inodoAux.mtime);
-                    strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
-                    strcat(buffer, mtime);
-                    strcat(buffer, "\t");
+                        //mTime
+                        struct tm *ts;
+                        char mtime[TAMFILA];
+                        ts = localtime(&inodoAux.mtime);
+                        strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
+                        strcat(buffer, mtime);
+                        strcat(buffer, "\t");
 
-                    //Tamaño
-                    memset(longitud, '\0', sizeof(longitud));
-                    sprintf(longitud, "%d", inodoAux.tamEnBytesLog);
-                    strcat(buffer, longitud);
-                    strcat(buffer, "\t\t");
+                        //Tamaño
+                        memset(longitud, '\0', sizeof(longitud));
+                        sprintf(longitud, "%d", inodoAux.tamEnBytesLog);
+                        strcat(buffer, longitud);
+                        strcat(buffer, "\t\t");
+                    }
 
                     //Nombre
                     strcat(buffer, entrada.nombre);
@@ -289,37 +291,39 @@ int mi_dir(const char *camino, char *buffer, char tipo){
             return -1;
         }
 
-        //Permisos
-        if (inodo.permisos & 4){
-            strcat(buffer, "r");
-        } else {
-            strcat(buffer, "-");
-        }
-        if (inodo.permisos & 2){
-            strcat(buffer, "w");
-        } else {
-            strcat(buffer, "-");
-        }
-        if (inodo.permisos & 1){
-            strcat(buffer, "x");
-        } else {
-            strcat(buffer, "-");
-        }
-        strcat(buffer, "\t\t");
+        if(formato=='e'){
+            //Permisos
+            if (inodo.permisos & MASC_READ){
+                strcat(buffer, "r");
+            } else {
+                strcat(buffer, "-");
+            }
+            if (inodo.permisos & MASC_WRTE){
+                strcat(buffer, "w");
+            } else {
+                strcat(buffer, "-");
+            }
+            if (inodo.permisos & MASC_EXEC){
+                strcat(buffer, "x");
+            } else {
+                strcat(buffer, "-");
+            }
+            strcat(buffer, "\t\t");
 
-        //mTime
-        struct tm *ts;
-        char mtime[TAMFILA];
-        ts = localtime(&inodo.mtime);
-        strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
-        strcat(buffer, mtime);
-        strcat(buffer, "\t");
+            //mTime
+            struct tm *ts;
+            char mtime[TAMFILA];
+            ts = localtime(&inodo.mtime);
+            strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
+            strcat(buffer, mtime);
+            strcat(buffer, "\t");
 
-        //Tamaño
-        memset(longitud, '\0', sizeof(longitud));
-        sprintf(longitud, "%d", inodo.tamEnBytesLog);
-        strcat(buffer, longitud);
-        strcat(buffer, "\t\t");
+            //Tamaño
+            memset(longitud, '\0', sizeof(longitud));
+            sprintf(longitud, "%d", inodo.tamEnBytesLog);
+            strcat(buffer, longitud);
+            strcat(buffer, "\t\t");
+        }
         
         //Nombre
         char tipo, inicial[strlen(camino)], final[strlen(camino)];
