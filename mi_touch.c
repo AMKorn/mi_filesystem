@@ -10,6 +10,7 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
 
+    //Comprobación de que se quiere crear un fichero
     if(RUTA[strlen(RUTA)-1] == '/'){
         fprintf(stderr, "mi_touch no puede crear directorios\n");
         return EXIT_FAILURE;

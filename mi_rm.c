@@ -15,6 +15,12 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
 
+    //Comprobación de que se quiere eliminar un fichero
+    if(RUTA[strlen(RUTA)-1] == '/'){
+        fprintf(stderr, "mi_rm no puede eliminar directorios\n");
+        return EXIT_FAILURE;
+    }
+
     if(bmount(DISCO)==-1) return EXIT_FAILURE;
 
     if(mi_unlink(RUTA)!=EXIT_SUCCESS) return EXIT_FAILURE;
