@@ -537,6 +537,7 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
    if (ptr==0) {  //No existe bloque de datos
       if (reservar==0) return -1;  //Error lectura ∄ bloque   
       else {
+         mi_waitSem();//Semaforo
          salvar_inodo = 1;
          ptr = reservar_bloque();   //De datos
          inodo.numBloquesOcupados++;
@@ -550,6 +551,7 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
 			   //fprintf(stdout,"[traducir_bloque_inodo()→ punteros_nivel%d [%d] = %d (reservado BF %d para BL %u)]\n",(nivel_punteros+1),indice,ptr,ptr,nblogico);
             bwrite(ptr_ant, buffer);
          }
+         mi_signalSem();//Semaforo
       }
    }
 

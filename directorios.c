@@ -163,14 +163,17 @@ void mostrar_error_buscar_entrada(int error) {
  * @return          - EXIT_SUCCESS o EXIT_FAILURE
  * */
 int mi_creat(const char *camino, unsigned char permisos){
+    mi_waitSem();//Semaforo 
     unsigned int p_inodo_dir, p_inodo, p_entrada;
     p_inodo_dir=0;
     char reservar = 1;
     int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
     if(e != EXIT_SUCCESS){
         mostrar_error_buscar_entrada(e);
+        mi_signalSem();
         return EXIT_FAILURE;
     }
+    mi_signalSem();//Semaforo
     return EXIT_SUCCESS;
 }
 
@@ -468,13 +471,14 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
  * @return          - EXIT_SUCCESS o EXIT_FAILURE
  * */
 int mi_link(const char *camino1, const char *camino2){
-    
+    mi_waitSem();//Semaforo 
     unsigned int p_inodo_dir = 0;
     unsigned int p_inodo = 0;
     unsigned int p_entrada = 0;
 
     struct entrada entrada;
     if (buscar_entrada(camino1, &p_inodo_dir, &p_inodo, &p_entrada, 0, 6) == -1) {
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
 
@@ -482,16 +486,19 @@ int mi_link(const char *camino1, const char *camino2){
     struct inodo inodo;
     if (leer_inodo(ninodo1, &inodo) == -1) {
         printf("Error en mi_link(): No se pudo leer el inodo\n");
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
     if ((inodo.permisos & MASC_READ) != MASC_READ) {
         fprintf(stderr, "El inodo no tiene permisos de lectura.\n");
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
 
     //Comprobamos que camino1 se refiere a un fichero.
     if (inodo.tipo != 'f') {
         printf("Error: No existe el archivo o el directorio.\n");
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
 
@@ -502,12 +509,14 @@ int mi_link(const char *camino1, const char *camino2){
 
     if (buscar_entrada(camino2, &p_inodo_dir, &p_inodo, &p_entrada, 1, 6) == ERROR_ENTRADA_YA_EXISTENTE) {
         printf("Error: El archivo ya existe.\n");
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
 
     //Leemos la entrada creada
     if (mi_read_f(p_inodo_dir, &entrada, (p_entrada) * sizeof(entrada), sizeof(entrada)) == -1) {
         printf("Error en mi_link(): Error al leer la entrada %d\n", p_entrada);
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
 
@@ -517,6 +526,7 @@ int mi_link(const char *camino1, const char *camino2){
 
     if (mi_write_f(p_inodo_dir, &entrada, (p_entrada) * sizeof(entrada), sizeof(entrada)) < 0) {
         printf("Error en mi_link(): Error al escribir la entrada modificada\n");
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
 
@@ -526,9 +536,11 @@ int mi_link(const char *camino1, const char *camino2){
 
     if (escribir_inodo(ninodo1, inodo) == -1) {
         printf("Error en mi_link(): Error al escribir el inodo\n");
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
     
+    mi_signalSem();//Semaforo
     return EXIT_SUCCESS;
 }
 
@@ -539,6 +551,7 @@ int mi_link(const char *camino1, const char *camino2){
  * */
 int mi_unlink(const char *camino){
 
+    mi_waitSem();//Semaforo
     unsigned int p_inodo_dir = 0;
     unsigned int p_inodo = 0;
     unsigned int p_entrada = 0;
@@ -551,6 +564,7 @@ int mi_unlink(const char *camino){
     int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
     if(e != EXIT_SUCCESS){
         mostrar_error_buscar_entrada(e);
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
 
@@ -560,6 +574,7 @@ int mi_unlink(const char *camino){
     //Si se trata de un directorio  y no está vacío (inodo.tamEnBytesLog > 0) entonces no se puede borrar y salimos de la función. 
     if (ino.tipo == 'd' && ino.tamEnBytesLog > 0) {
         printf("Error: El directorio %s no está vacío\n", camino);
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
     ino.nlinks--;
@@ -573,6 +588,7 @@ int mi_unlink(const char *camino){
     //y obtenemos el nº de entradas que tiene (inodo_dir.tamEnBytesLog/sizeof(struct entrada))
     if (leer_inodo(p_inodo_dir, &ino) == -1) {
         fprintf(stderr, "Error al leer. No se pudo leer el inodo\n");
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
     nentradas = ((ino.tamEnBytesLog) / (sizeof(entrada)));
@@ -580,15 +596,19 @@ int mi_unlink(const char *camino){
     //y después ya podemos truncar el inodo como en el caso anterior.
     if (p_entrada != (nentradas - 1)) {
         if (mi_read_f(p_inodo_dir, &entrada, ino.tamEnBytesLog - (sizeof(entrada)), sizeof(entrada)) == -1) {
+            mi_signalSem();//Semaforo
             return EXIT_FAILURE;
         }
         if (mi_write_f(p_inodo_dir, &entrada, p_entrada * sizeof(entrada), sizeof(entrada)) == -1) {
+            mi_signalSem();//Semaforo
             return EXIT_FAILURE;
         }
     }
     if (mi_truncar_f(p_inodo_dir, ino.tamEnBytesLog - (sizeof(entrada))) == -1) {
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
 
+    mi_signalSem();//Semaforo
     return EXIT_SUCCESS;
 }

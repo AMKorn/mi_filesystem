@@ -1,7 +1,12 @@
 // * bloques.c *
 #include "bloques.h"
+#include "semaforo_mutex_posix.h"
+
 
 static int descriptor = 0;
+static sem_t *mutex;
+static unsigned int inside_sc = 0; //Para evitar que un wait se haga dos veces
+
 
 /**
  * Abre el archivo pasado por parámetro o lo crea si es necesario.
@@ -9,6 +14,13 @@ static int descriptor = 0;
  * @return el descriptor de fichero del fichero abierto.
  */
 int bmount(const char *camino){
+    mutex = initSem();//Inicializar semaforo
+    /*
+    if (mutex == NULL) {
+		puts("Error de semáforo");
+		exit(1);
+	}
+    */
     umask(000);
     descriptor = open(camino, O_RDWR|O_CREAT, 0666);
     if(descriptor == -1){
@@ -22,6 +34,7 @@ int bmount(const char *camino){
  * @return 0 en éxito, -1 en error.
  */
 int bumount(){
+    deleteSem();//Eliminar Semaforo
     return close(descriptor);
 }
 
@@ -45,4 +58,19 @@ int bwrite(unsigned int nbloque, const void *buf){
 int bread(unsigned int nbloque, void *buf){
     lseek(descriptor, nbloque*BLOCKSIZE, SEEK_SET);
     return read(descriptor, buf, BLOCKSIZE);
+}
+
+
+void mi_waitSem(){
+    if (!inside_sc) {
+        waitSem(mutex);
+    }
+    inside_sc++;
+}
+
+void mi_signalSem() {
+    inside_sc--;
+    if (!inside_sc) {
+        signalSem(mutex);
+    }
 }
