@@ -30,20 +30,20 @@ echo "$ ./mi_chmod #comprobar sintaxis"
 echo "######################################################################"
 echo "$ ./mi_chmod disco 1 /dir1/dir11/ #cambio a permiso ejecución"
 ./mi_chmod disco 1 /dir1/dir11/  
-echo "$ ./mi_mkdir disco 6 /dir1/dir11/fic111 #Error: Permiso denegado de lectura."
-./mi_mkdir disco 6 /dir1/dir11/fic111  
+echo "$ ./mi_touch disco 6 /dir1/dir11/fic111 #Error: Permiso denegado de lectura."
+./mi_touch disco 6 /dir1/dir11/fic111  
 echo "######################################################################"
 echo "$ ./mi_chmod disco 2 /dir1/dir11/ #cambio a permiso escritura"
 ./mi_chmod disco 2 /dir1/dir11/  
-echo "$ ./mi_mkdir disco 6 /dir1/dir11/fic111 #Error: Permiso denegado de lectura."
-./mi_mkdir disco 6 /dir1/dir11/fic111  
+echo "$ ./mi_touch disco 6 /dir1/dir11/fic111 #Error: Permiso denegado de lectura."
+./mi_touch disco 6 /dir1/dir11/fic111  
 echo "######################################################################"
 echo "$ ./mi_chmod disco 6 /dir1/dir11/ #cambio a permiso lectura/escritura"
 ./mi_chmod disco 6 /dir1/dir11/   
-echo "$ ./mi_mkdir disco 6 /dir1/dir11/fic111"
-./mi_mkdir disco 6 /dir1/dir11/fic111  
-echo "$ ./mi_mkdir disco 6 /dir1/dir11/fic112"
-./mi_mkdir disco 6 /dir1/dir11/fic112  
+echo "$ ./mi_touch disco 6 /dir1/dir11/fic111"
+./mi_touch disco 6 /dir1/dir11/fic111  
+echo "$ ./mi_touch disco 6 /dir1/dir11/fic112"
+./mi_touch disco 6 /dir1/dir11/fic112  
 echo "######################################################################"
 echo
 echo
@@ -61,7 +61,7 @@ echo "$ ./mi_ls disco /"
 echo "$ ./mi_stat disco /dir1/"
 ./mi_stat disco /dir1/
 echo "$ ./mi_ls disco /dir1/"
-./mi_ls disco /dir1/
+./mi_ls disco /dir1/ 
 echo "$ ./mi_stat disco /dir1/dir11/"
 ./mi_stat disco /dir1/dir11/
 echo "$ ./mi_ls disco /dir1/dir11/"
@@ -69,12 +69,12 @@ echo "$ ./mi_ls disco /dir1/dir11/"
 echo "$ ./mi_ls disco /dir1/dir12/ #Error: No existe el archivo o el directorio."
 ./mi_ls disco /dir1/dir12/
 echo "######################################################################"
-echo "$ ./mi_mkdir disco 6 /dir1/dir11/fic111 #Error: El archivo ya existe."
-./mi_mkdir disco 6 /dir1/dir11/fic111  
+echo "$ ./mi_touch disco 6 /dir1/dir11/fic111 #Error: El archivo ya existe."
+./mi_touch disco 6 /dir1/dir11/fic111  
 echo "$ ./mi_mkdir disco 6 /dir1/dir11/fic111/dir12/ #Error: No es un directorio."
 ./mi_mkdir disco 6 /dir1/dir11/fic111/dir12/
-echo "$ ./mi_mkdir disco 6 /dir1/dir11/dir12/fic111 #Error: No existe algún directorio intermedio."
-./mi_mkdir disco 6 /dir1/dir11/dir12/fic111
+echo "$ ./mi_touch disco 6 /dir1/dir11/dir12/fic111 #Error: No existe algún directorio intermedio."
+./mi_touch disco 6 /dir1/dir11/dir12/fic111
 echo "$ ./mi_mkdir disco 9 /dir2/ #Error: modo inválido: <<9>>"
 ./mi_mkdir disco 9 /dir2/
 echo
@@ -158,8 +158,8 @@ echo
 echo "######################################################################"
 echo "$ ./mi_ls disco /dir1/dir11/"
 ./mi_ls disco /dir1/dir11/
-echo "$ ./mi_mkdir disco 6 /dir1/dir11/fic113"
-./mi_mkdir disco 6 /dir1/dir11/fic113
+echo "$ ./mi_touch disco 6 /dir1/dir11/fic113"
+./mi_touch disco 6 /dir1/dir11/fic113
 echo "$ ./mi_escribir disco /dir1/dir11/fic113 hellooooooo 605000 #⊂ BL 400.004 ∈ I2"
 ./mi_escribir disco /dir1/dir11/fic113 "hellooooooo" 605000
 echo "######################################################################"

@@ -10,6 +10,11 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
 
+    if(RUTA[strlen(RUTA)-1] != '/'){
+        fprintf(stderr, "mi_mkdir no puede crear ficheros\n");
+        return EXIT_FAILURE;
+    }
+
     // Montamos el disco
     if(bmount(DISCO)==-1) return EXIT_FAILURE;
 
