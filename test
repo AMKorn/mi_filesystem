@@ -1,4 +1,5 @@
 make
-./scripte2.sh
+./mi_mkfs disco 100000
+time ./simulacion disco
 rm disco
 make clean

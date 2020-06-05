@@ -1,4 +1,5 @@
 #include "directorios.h"
+#include "semaforo_mutex_posix.h"
 
 struct UltimaEntrada UltimaEntradaEscritura;
 struct UltimaEntrada UltimaEntradaLectura;

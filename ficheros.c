@@ -1,4 +1,5 @@
 #include "ficheros.h"
+#include "semaforo_mutex_posix.h"
 
 /**
  * Escribe el contenido procedente de un buffer de memoria, buf_original, de tamaño nbytes, en un fichero/directorio
