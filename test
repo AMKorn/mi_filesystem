@@ -1,4 +1,4 @@
 make
-./tests/script2e1.sh
+./scripte2.sh
 rm disco
 make clean

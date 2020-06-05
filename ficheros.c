@@ -71,7 +71,9 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
         }        
         bytes += desp2+1;
     }
+    
     // Actualización de metainformación
+    mi_waitSem();//Semaforo
     leer_inodo(ninodo, &inodo);
     if(inodo.tamEnBytesLog < bytes) {
         inodo.tamEnBytesLog = bytes;
@@ -79,6 +81,7 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     }
     inodo.mtime = time(NULL);
     escribir_inodo(ninodo, inodo);
+    mi_signalSem();//Semaforo
 
     return bytes - offset;
 }
@@ -163,12 +166,15 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
         leidos += desp2+1;
     }
 
-    
-
     // Actualización de metainformación
+    mi_waitSem();//Semaforo
     leer_inodo(ninodo, &inodo);
     inodo.atime = time(NULL);
-    if(escribir_inodo(ninodo, inodo) < 0) return -1;
+    if(escribir_inodo(ninodo, inodo) < 0){
+        mi_signalSem();//Semaforo
+        return -1; 
+    }
+    mi_signalSem();//Semaforo
 
     //fprintf(stderr, "P4: %d\n",leidos);    
     return leidos;
@@ -203,8 +209,10 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
  * @return EXIT_SUCCESS o EXIT_FAILURE
  */
 int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
+    mi_waitSem();//Semaforo
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
 
@@ -220,9 +228,10 @@ int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
     inodo.ctime = time(NULL);
 
     if(escribir_inodo(ninodo, inodo) == EXIT_FAILURE) {
+        mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
-
+    mi_signalSem();//Semaforo
     return EXIT_SUCCESS;
 }
 

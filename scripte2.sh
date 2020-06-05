@@ -266,8 +266,8 @@ echo "$ ./mi_ls disco /dir3/"
 ./mi_ls disco /dir3/
 echo "######################################################################"
 echo "Eliminamos el subdirectorio sd3 de dir3"
-echo "$ ./mi_rm disco /dir3/sd3/"
-./mi_rm disco /dir3/sd3/
+echo "$ ./mi_rmdir disco /dir3/sd3/"
+./mi_rmdir disco /dir3/sd3/
 echo "######################################################################"
 echo
 echo "             /"
