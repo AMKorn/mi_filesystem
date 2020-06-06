@@ -16,10 +16,10 @@ echo "$ ./escribir"
 echo "#consultamos sintaxis comando"
 ./escribir
 echo "################################################################################"
-echo "$ ./escribir disco "123456789" 0"
+echo "$ ./escribir disco "123456789" 0 -t"
 echo "#escribimos el texto “123456789” en los offsets  9000, 209000, 30725000, "
 echo "#409605000 y 480000000 de un mismo inodo"
-./escribir disco "123456789" 0
+./escribir disco "123456789" 0 -t
 echo "################################################################################"
 echo "$ ./leer disco 1 > ext1.txt"
 echo "#leemos el contenido del inodo 1 y lo direccionamos al fichero externo ext1.txt"
@@ -30,10 +30,10 @@ echo "#comprobamos cuánto ocupa el fichero externo"
 echo "#(ha de coincidir con el tamaño en bytes lógico del inodo y con los bytes leídos)"
 ls -l ext1.txt
 echo "################################################################################"
-echo "$ ./escribir disco "123456789" 1"
+echo "$ ./escribir disco "123456789" 1 -t"
 echo "#escribimos el texto “123456789” en los offsets 9000, 209000, 30725000, "
 echo "#409605000 y 480000000, de inodos diferentes"
-./escribir disco "123456789" 1
+./escribir disco "123456789" 1 -t
 echo "################################################################################"
 echo "$ ./leer disco 2 > ext2.txt"  
 echo "#leemos el contenido del inodo 2 (escrito en el offset 9000) y lo direccionamos"

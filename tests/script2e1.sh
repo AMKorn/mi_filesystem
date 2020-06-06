@@ -6,10 +6,10 @@ rm disco
 echo "$ ./mi_mkfs disco 100000"
 ./mi_mkfs disco 100000
 echo "################################################################################"
-echo "$ ./escribir disco "$(cat texto2.txt)" 1"
+echo "$ ./escribir disco texto2.txt 1 -f"
 echo "#escribimos el texto contenido en text2.txt en los offsets  9000, 209000, 30725000, "
 echo "#409605000 y 480000000 de inodos diferentes"
-./escribir disco "$(cat texto2.txt)" 1
+./escribir disco texto2.txt 1 -f
 echo "################################################################################"
 echo "$ ./leer disco 2 > ext4.txt"
 echo "#leemos el contenido del inodo 2 (escrito en el offset 209000) y lo direccionamos"
