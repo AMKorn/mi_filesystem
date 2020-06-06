@@ -35,20 +35,31 @@ int main(int argc, char **argv){
     mi_creat(camino, 6);
     // ********************************************************************
 
-    char buff[sizeof(struct entrada)];
-
-    for(int i = 0; i < NUMPROCESOS; i++){
-        mi_read(DIR, buff, 0, sizeof(struct entrada));
+    //char buff[sizeof(struct entrada)];
+    
+	//struct entrada entradas[NUMPROCESOS];
+    struct entrada ent;
+    //Para cada entrada del directorio de simulación (es decir, para cada proceso) hacer    
+    for(int i = 0; i < NUMPROCESOS; i++){  
+        // Leer la entrada de directorio.
+        if (mi_read(DIR, ent, 0, sizeof(entrada)) == -1) {
+		printf("Error: En la lectura del directorio\n");
+		return -1;
+	    } 
 
         struct INFORMACION info;
+        //Extraer el PID a partir del nombre de la entrada y guardarlo en el registro info.
+        info.pid= atoi(strchr(entradas[i].nombre, '_'));
 
-        info.pid= atoi(strchr(buff, '_'));
-
+        
         int cant_registros_buffer_escrituras = 256;
         struct REGISTRO buffer_escrituras[cant_registros_buffer_escrituras];
         char prueba[sizeof(buffer_escrituras)];
-        while(mi_read(prueba, buffer_escrituras, 0, sizeof(buffer_escrituras)) > 0){
 
+        struct REGISTRO reg;
+        /* Recorrer secuencialmente el fichero prueba.dat utilizando un buffer de N registros de escrituras: */
+        while(mi_read(prueba, buffer_escrituras, 0, sizeof(buffer_escrituras)) > 0){ //mientras haya escrituras
+            
         }
     }
 
