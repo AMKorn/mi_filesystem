@@ -193,22 +193,22 @@ int mi_dir(const char *camino, char *buffer, char tipo){
     int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, 0, 6);
     if (e < 0){
         mostrar_error_buscar_entrada(e);
-        return -1;
+        return EXIT_FAILURE;
     }
 
     if (leer_inodo(p_inodo, &inodo) == -1){
         fprintf(stderr, "Error al leer_inodo en mi_dir\n");
-        return -1;
+        return EXIT_FAILURE;
     }
     //Comprobación permisos de lectura del inodo
     if ((inodo.permisos & MASC_READ) != MASC_READ){
         fprintf(stderr, "Sin permisos de lectura\n");
-        return -1;
+        return EXIT_FAILURE;
     }
     //Comprobación de que el tipo del inodo coincida con el del parametro
     if(inodo.tipo != tipo){
         fprintf(stderr, "Error: la sintaxis no concuerda con el tipo\n");
-        return -1;
+        return EXIT_FAILURE;
     }
 
     int nentrada;
@@ -220,14 +220,14 @@ int mi_dir(const char *camino, char *buffer, char tipo){
             //Leemos la entrada
             if (mi_read_f(p_inodo, &entrada, nentrada * sizeof(entrada), sizeof(entrada)) < 0){
                 fprintf(stderr, "Error mi_read_f en mi_dir\n");
-                return -1;
+                return EXIT_FAILURE;
             }
 
             if (entrada.ninodo >= 0){
 
                 struct inodo inodoAux;
                 if (leer_inodo(entrada.ninodo, &inodoAux) == -1){
-                    return -1;
+                    return EXIT_FAILURE;
                 }
 
                 if (inodoAux.tipo != 'l'){
@@ -285,7 +285,7 @@ int mi_dir(const char *camino, char *buffer, char tipo){
 
         if (mi_read_f(p_inodo, &entrada, nentrada*sizeof(entrada), sizeof(entrada)) < 0) {
             fprintf(stderr, "Error mi_read_f en mi_dir\n");
-            return -1;
+            return EXIT_FAILURE;
         }
 
         //Permisos
@@ -438,7 +438,7 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
     unsigned int p_inodo = 0;
     unsigned int p_entrada = 0;
     unsigned char reservar = 0;
-    unsigned char permisos = 7; //No se que permisos ponerle, le pondré 7 de momento
+    unsigned char permisos = 7;
     int leidos;
     int error;
 
@@ -453,6 +453,11 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
         fprintf(stderr,"ERROR: MI_READ_F\n");
         return EXIT_FAILURE;
     }
+
+    // Actualizamos la caché
+    strcpy(UltimaEntradaLectura.camino, camino);
+    UltimaEntradaLectura.p_inodo=p_inodo;
+
     return leidos; 
 }
 
