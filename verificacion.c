@@ -1,9 +1,9 @@
 #include "verificacion.h"
 
-#define NOMBRE_FICHERO_PRUEBA "prueba.dat"
-
 #define DISCO 	argv[1]
 #define DIR 	argv[2]
+
+#define FICHERO_PRUEBA "prueba.dat"
 
 int main (int argc, char **argv) {
     // Comprobamos los parametros
@@ -71,7 +71,7 @@ int main (int argc, char **argv) {
         info.MayorPosicion.nRegistro = 0;
 
 		char camino_fichero_prueba[128];
-		sprintf(camino_fichero_prueba, "%s%s/%s", DIR, entradas[i].nombre, NOMBRE_FICHERO_PRUEBA);
+		sprintf(camino_fichero_prueba, "%s%s/%s", DIR, entradas[i].nombre, FICHERO_PRUEBA);
 		
 		int offset = 0;
 		
