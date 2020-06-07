@@ -32,7 +32,7 @@ int main(int argc, char const *argv[]) {
 
     struct tm *tm;
     time_t tiempo;
-    char *dir[100];
+    char dir[100];
 
     //Creamos el directorio de simulación en la raíz
     time(&tiempo);
