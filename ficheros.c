@@ -24,7 +24,9 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     int bytes = offset;
 
     // Preparación1 para la escritura de los bloques
+    mi_waitSem();//Semaforo 
     int nbloque = traducir_bloque_inodo(ninodo, primerBLogico, 1);
+    mi_signalSem();//Semaforo
     if(nbloque == -1) return -1;
     unsigned char buf_bloque[BLOCKSIZE];
     if(bread(nbloque, buf_bloque) == -1){
@@ -51,7 +53,9 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
         
         // Bloques intermedios
         for(int i = primerBLogico+1; i < ultimoBLogico; i++){
+            mi_waitSem();//Semaforo 
             nbloque = traducir_bloque_inodo(ninodo, i, 1);
+            mi_signalSem();//Semaforo
             if(bwrite(nbloque, buf_original + (BLOCKSIZE - desp1) + (i - primerBLogico - 1) * BLOCKSIZE) == -1){
                 fprintf(stderr, "mi_write_f(): Error de escritura de bloque. Bloques intermedios.\n");
                 return -1;
