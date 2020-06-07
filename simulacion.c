@@ -128,6 +128,7 @@ int main(int argc, char const *argv[]) {
     }
     // Desmontamos el disco
     bumount(); //proceso padre
+    printf("\n");
     return 0;
 }
       

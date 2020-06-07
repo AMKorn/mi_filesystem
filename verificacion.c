@@ -1,6 +1,9 @@
 #include "verificacion.h"
+
 #define NOMBRE_FICHERO_PRUEBA "prueba.dat"
-#define NUM_PROCESOS NUMPROCESOS
+
+#define DISCO argv[1]
+#define DIR argv[2]
 
 int main (int argc, char **argv) {
     // Comprobamos los parametros
@@ -11,81 +14,106 @@ int main (int argc, char **argv) {
 	}
 	
 	// Montamos el dispositivo virtual
-	if (bmount(argv[1]) == -1) {
+	if (bmount(DISCO) == -1) {
 		printf("ERROR: Main: Fallo al montar el sistema de archivos\n");
 		exit(0);
 	}
 	
 	// Obtenemos la metainformacion del directorio de simulacion
 	struct STAT stat;
- 	if (mi_stat(argv[2], &stat) == -1) {
+ 	if (mi_stat(DIR, &stat) == -1) {
 		printf("ERROR: main: Fallo obteniendo la metainformacion del directorio de simulacion\n");
 		exit(0);
 	}
 
-	printf("\ndir_sim: %s\n", argv[2]);
+	printf("\ndir_sim: %s\n", DIR);
     
     int numentradas = stat.tamEnBytesLog / sizeof(struct entrada);
-    if (numentradas != NUM_PROCESOS) {
+    if (numentradas != NUMPROCESOS) {
         return -1;
     }
-	printf("numentradas: %d NUM_PROCESOS: %d\n", numentradas, NUM_PROCESOS);
+	
+    printf("numentradas: %d NUMPROCESOS: %d\n", numentradas, NUMPROCESOS);
 
     // Inicializamos el camino del fichero de informe
 	char camino_fichero_informe[128];
-	sprintf(camino_fichero_informe, "%s%s", argv[2], "informe.txt");
+	sprintf(camino_fichero_informe, "%s%s", DIR, "informe.txt");
 	// Creamos el fichero de informe
 	if (mi_creat(camino_fichero_informe, 7) == -1) {
 		printf("ERROR: main: Error creando el fichero informe\n");
 		exit(0);
 	}
 	
-	struct entrada entradas[NUM_PROCESOS];
-	if (mi_read(argv[2], entradas, 0, sizeof(entradas)) == -1) {
-		printf("ERROR: main: Error leyendo entradas del directorio de simulacion\n");
-		exit(0);
-	}
-	int i, nbytes_informe = 0;
-	for (int i = 0; i < NUM_PROCESOS; i++) {
+    int nbytes_informe = 0;
+	struct entrada entradas[NUMPROCESOS*sizeof(struct entrada)];
+	
+	for (int i = 0; i < NUMPROCESOS; i++) {
 	    struct INFORMACION info;
-	    info.pid = atoi(strchr(entradas[i].nombre, '_') + 1);
-		
+        if (mi_read(DIR, entradas, 0, sizeof(entradas)) == -1) {
+		    printf("ERROR: main: Error leyendo entradas del directorio de simulacion\n");
+		    exit(0);
+	    }
+	    
+        //Inicializamos la informacion
+        info.pid = atoi(strchr(entradas[i].nombre, '_') + 1);
 		info.nEscrituras = 0;
+        info.PrimeraEscritura.fecha = time(NULL);
+        info.PrimeraEscritura.nEscritura = NUMESCRITURAS;
+        info.PrimeraEscritura.nRegistro = 0;
+        info.UltimaEscritura.fecha = time(NULL);
+        info.UltimaEscritura.nEscritura = 0;
+        info.UltimaEscritura.nRegistro = 0;
+        info.MenorPosicion.fecha = time(NULL);
+        info.MenorPosicion.nEscritura = 0;
+        info.MenorPosicion.nRegistro = REGMAX;
+        info.MayorPosicion.fecha = time(NULL);
+        info.MayorPosicion.nEscritura = 0;
+        info.MayorPosicion.nRegistro = 0;
+
 		char camino_fichero_prueba[128];
-		sprintf(camino_fichero_prueba, "%s%s/%s", argv[2], entradas[i].nombre, NOMBRE_FICHERO_PRUEBA);
+		sprintf(camino_fichero_prueba, "%s%s/%s", DIR, entradas[i].nombre, NOMBRE_FICHERO_PRUEBA);
 		
 		int offset = 0;
 		
-		int cant_registros_buffer_escrituras = 6144; //
-		struct REGISTRO buffer_escrituras [cant_registros_buffer_escrituras];
-		while (mi_read(camino_fichero_prueba,buffer_escrituras,offset, sizeof(buffer_escrituras)) > 0) {
-			int j;
-            for (j = 0; j < cant_registros_buffer_escrituras; j++) {
-				if (buffer_escrituras[j].pid == info.pid) {
-					
-					if (info.nEscrituras == 0) {
-						info.PrimeraEscritura = buffer_escrituras[j];
-						info.UltimaEscritura = buffer_escrituras[j];
-						info.MenorPosicion = buffer_escrituras[j];
-						info.MayorPosicion = buffer_escrituras[j];
-					} else {
-						if(info.PrimeraEscritura.nEscritura > buffer_escrituras[j].nEscritura){
-							info.PrimeraEscritura = buffer_escrituras[j];
-						} else if(info.UltimaEscritura .nEscritura < buffer_escrituras[j].nEscritura){
-							info.UltimaEscritura  = buffer_escrituras[j];
-						}
-						if (buffer_escrituras[j].nEscritura < info.MenorPosicion.nEscritura) {
-							info.MenorPosicion = buffer_escrituras[j];
-						} else if (buffer_escrituras[j].nEscritura > info.MayorPosicion.nEscritura) {
-							info.MayorPosicion = buffer_escrituras[j];
-						}
-					}
-					info.nEscrituras++;
-				}
-			}
-			memset(buffer_escrituras, 0, sizeof(buffer_escrituras));
-			offset += sizeof(buffer_escrituras);
+		int cant_registros_buffer_escrituras = 256;
+        struct REGISTRO buffer_escrituras [cant_registros_buffer_escrituras];
+		memset(buffer_escrituras, 0, sizeof(buffer_escrituras));
+
+        int lectura = mi_read(camino_fichero_prueba,buffer_escrituras,offset, sizeof(buffer_escrituras));
+        while (info.nEscrituras < NUMESCRITURAS && lectura > 0) {
+            for (int j = 0; j < cant_registros_buffer_escrituras; j++) {
+                if (buffer_escrituras[j].pid == info.pid) {
+                    if (buffer_escrituras[j].nEscritura < info.PrimeraEscritura.nEscritura) {
+                        info.PrimeraEscritura.fecha = buffer_escrituras[j].fecha;
+                        info.PrimeraEscritura.nEscritura = buffer_escrituras[j].nEscritura;
+                        info.PrimeraEscritura.nRegistro = buffer_escrituras[j].nRegistro;
+                    }
+                    
+                    if (buffer_escrituras[j].nEscritura > info.UltimaEscritura.nEscritura) {
+                        info.UltimaEscritura.fecha = buffer_escrituras[j].fecha;
+                        info.UltimaEscritura.nEscritura = buffer_escrituras[j].nEscritura;
+                        info.UltimaEscritura.nRegistro = buffer_escrituras[j].nRegistro;
+                    }
+                    
+                    if (buffer_escrituras[j].nRegistro < info.MenorPosicion.nRegistro) {
+                        info.MenorPosicion.fecha = buffer_escrituras[j].fecha;
+                        info.MenorPosicion.nEscritura = buffer_escrituras[j].nEscritura;
+                        info.MenorPosicion.nRegistro = buffer_escrituras[j].nRegistro;
+                    }
+                    
+                    if (buffer_escrituras[j].nRegistro > info.MayorPosicion.nRegistro) {
+                        info.MayorPosicion.fecha = buffer_escrituras[j].fecha;
+                        info.MayorPosicion.nEscritura = buffer_escrituras[j].nEscritura;
+                        info.MayorPosicion.nRegistro = buffer_escrituras[j].nRegistro;
+                    }
+                    info.nEscrituras++;
+                }
+            }
+            memset(buffer_escrituras, 0, sizeof(buffer_escrituras));
+            offset += sizeof(buffer_escrituras);
+            lectura = mi_read(camino_fichero_prueba,buffer_escrituras,offset, sizeof(buffer_escrituras));
         }
+
         // Escribimos la informacion del registros [j]_info en el fichero de informe
 		char buffer[1024];
 		memset(buffer, 0, 1024);
@@ -120,8 +148,9 @@ int main (int argc, char **argv) {
 			printf("ERROR: main: Error escribiendo en el informe\n");
 		}
 		nbytes_informe += strlen(buffer);
-	printf("%d escrituras validadas en %s\n", info.nEscrituras, camino_fichero_prueba);
+	    printf("%d) %d escrituras validadas en %s\n", i, info.nEscrituras, camino_fichero_prueba);
 	}
+    
 	// Desmontamos el dispositivo
 	if (bumount() == -1) {
 		printf("ERROR: main: Error desmontando el dispositivo\n");

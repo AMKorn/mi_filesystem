@@ -391,7 +391,7 @@ int mi_stat(const char *camino, struct STAT *p_stat){
     strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
     ts = localtime(&p_stat->ctime);
     strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
-
+    /*
     printf("Número de Inodo: %d\n", p_inodo);
     printf("Tipo: %c\n", p_stat->tipo);
     printf("Permisos %d\n", p_stat->permisos);
@@ -401,7 +401,7 @@ int mi_stat(const char *camino, struct STAT *p_stat){
     printf("nlinks: %d\n", p_stat->nlinks);
     printf("tamEnBytesLog: %d\n", p_stat->tamEnBytesLog);
     printf("numBloquesOcupados: %d\n", p_stat->numBloquesOcupados);
-
+    */
     return EXIT_SUCCESS;
 }
 
