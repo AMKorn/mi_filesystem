@@ -94,25 +94,25 @@ int main (int argc, char **argv) {
 		sprintf(buffer + strlen(buffer), "%s %i %i %s",
 		"Primera escritura: ",
 		info.PrimeraEscritura.nEscritura,
-		info.PrimeraEscritura.nEscritura,
+		info.PrimeraEscritura.nRegistro,
 		asctime(localtime(&info.PrimeraEscritura.fecha)));
 
 		sprintf(buffer + strlen(buffer), "%s %i %i %s",
 		"Ultima escritura: ",
 		info.UltimaEscritura.nEscritura,
-		info.UltimaEscritura.nEscritura,
+		info.UltimaEscritura.nRegistro,
 		asctime(localtime(&info.UltimaEscritura.fecha)));
 
 		sprintf(buffer + strlen(buffer), "%s %i %i %s",
 		"Menor posicion: ",
 		info.MenorPosicion.nEscritura,
-		info.MenorPosicion.nEscritura,
+		info.MenorPosicion.nRegistro,
 		asctime(localtime(&info.MenorPosicion.fecha)));
 
 		sprintf(buffer + strlen(buffer), "%s %i %i %s %s",
 		"Mayor posicion: ",
 		info.MayorPosicion.nEscritura,
-		info.MayorPosicion.nEscritura,
+		info.MayorPosicion.nRegistro,
 		asctime(localtime(&info.MayorPosicion.fecha)),
 		"\n");
 

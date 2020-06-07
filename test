@@ -1,5 +1,10 @@
 make
 ./mi_mkfs disco 100000
 time ./simulacion disco
-rm disco
-make clean
+time ./verificacion disco "$(cat dir.txt)"
+./mi_cat disco /simul_20180523133828/informe.txt > resultado.txt
+ls -l resultado.txt
+cat resultado.txt
+./leer_sf disco
+#rm disco
+#make clean

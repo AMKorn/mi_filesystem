@@ -23,7 +23,7 @@ Después de  ./truncar disco 1 409605001 hacer ./leer_sf disco
 **Mejoras**
 *Realizadas*
 - mi_read y mi_write con cache
-- Elegir formato de salida en mi_ls
+- mi_ls: todas las mejoras
 - mi_touch
 - mi_rmdir
 - Lectura de ficheros externos de escribir.c
@@ -39,6 +39,16 @@ Después de  ./truncar disco 1 409605001 hacer ./leer_sf disco
 - mi_mv
 - mi_cp_f
 - mi_cp
+
+**Sintaxis**
+- escribir.c
+	- Argumentos esperados: <nombre_dispositivo> <texto|ruta_fichero> <diferentes_inodos> <modo>
+	- <modo> -> 2 modos 
+		+ -t, lectura directamente desde consola: escitura directa o cat.
+		+ -f, lectura desde fichero.
+- verificacion.c 
+	- Argumentos esperados: ./verificacion <disco> </directorio>
+	- En </directorio> podemos usar "$(cat dir.txt)" en lugar de copiar y pegar la ruta, ya que simulacion.c guarda el directorio de trabajo en ese dichero
 
 -----------------------------------------------------------------------------------------------------------
 1. Buscar_camino()[directorios.c], pasarlo a iterativo

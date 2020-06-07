@@ -1,5 +1,6 @@
 #include "simulacion.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #define DISCO argv[1]
 
@@ -31,7 +32,7 @@ int main(int argc, char const *argv[]) {
 
     struct tm *tm;
     time_t tiempo;
-    char dir [100];
+    char *dir[100];
 
     //Creamos el directorio de simulación en la raíz
     time(&tiempo);
@@ -48,6 +49,15 @@ int main(int argc, char const *argv[]) {
 
     printf("***Simulación de %d procesos realizando cada uno %d escrituras***\n", NUMPROCESOS, NUMESCRITURAS);
     printf("Directorio simulación: %s\n", dir);
+
+    // Guardamos el directorio en un fichero auxiliar 
+    FILE *f;
+    if ((f = fopen("dir.txt", "w")) == NULL) {
+        fprintf(stderr, "Error al guardar el directorio\n");
+        exit(1);
+    }
+    fprintf(f, "%s", dir);
+    fclose(f);
 
     for(int proceso = 1; proceso<=NUMPROCESOS; proceso++){
         if(fork() == 0){
