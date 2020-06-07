@@ -139,7 +139,7 @@ int main(int argc, char **argv){
 			printf("ERROR: main: Error escribiendo en el informe\n");
 		}
 		nbytes_informe += strlen(buffer);
-	printf("%d escrituras validadas en %s\n", info.nEscrituras, camino_fichero_prueba);
+        printf("%d escrituras validadas en %s\n", info.nEscrituras, camino_fichero_prueba);
     }
     // **FIN COPIADO** -Flag
 
