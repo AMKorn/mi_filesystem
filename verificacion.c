@@ -1,3 +1,9 @@
+/* Autores
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
 #include "verificacion.h"
 
 #define DISCO 	argv[1]
@@ -47,7 +53,7 @@ int main (int argc, char **argv) {
     int nbytes_informe = 0;
 	struct entrada entradas[NUMPROCESOS*sizeof(struct entrada)];
 	
-	for (int i = 1; i <= NUMPROCESOS; i++) {
+	for (int i = 0; i < NUMPROCESOS; i++) {
 	    struct INFORMACION info;
         if (mi_read(DIR, entradas, 0, sizeof(entradas)) == -1) {
 		    fprintf(stderr, "Error al leer entradas del directorio de simulacion\n");
@@ -135,7 +141,7 @@ int main (int argc, char **argv) {
 			return EXIT_FAILURE;
 		}
 		nbytes_informe += strlen(buffer); // Y actualizamos acordemente la cantidad de bytes del informe.
-	    printf("%d) %d escrituras validadas en %s\n", i, info.nEscrituras, camino_fichero_prueba);
+	    printf("%d) %d escrituras validadas en %s\n", i+1, info.nEscrituras, camino_fichero_prueba);
 	}
     
 	// Desmontamos el dispositivo

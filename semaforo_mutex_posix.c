@@ -1,3 +1,9 @@
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
 #include "semaforo_mutex_posix.h"
 
 /*Creación e inicialización de semáforos POSIX para MUTEX con "semáforos con nombre" (named) */

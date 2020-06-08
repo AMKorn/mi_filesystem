@@ -1,3 +1,9 @@
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
 #include "directorios.h"
 
 #define DISCO       argv[1]
@@ -7,18 +13,6 @@
 int main(int argc, char **argv){
     if(argc!=4) {
         fprintf(stderr, "Sintaxis: ./mi_mkdir <nombre_dispositivo> <permisos> </ruta>.\n");
-        return EXIT_FAILURE;
-    }
-
-    //Comprobación de que se quiere crear un directorio
-    if(RUTA[strlen(RUTA)-1] != '/'){
-        fprintf(stderr, "mi_mkdir no puede crear ficheros\n");
-        return EXIT_FAILURE;
-    }
-
-    //Comprobación de que no se quiere crear el directorio raíz
-    if(strcmp(RUTA, "/")==0){
-        fprintf(stderr, "No se puede crear el fichero raíz\n");
         return EXIT_FAILURE;
     }
 

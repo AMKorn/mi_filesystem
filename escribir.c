@@ -1,4 +1,10 @@
-#include "directorios.h"
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
+#include "ficheros.h"
 
 #define DISCO argv[1]
 #define FICHERO argv[2]
@@ -13,10 +19,11 @@ int main(int argc, char **argv){
 
     //Comprobamos la sintaxis
     if(argc != 5){
-		fprintf(stderr, "Argumentos esperados: <nombre_dispositivo> <texto|ruta_fichero> <diferentes_inodos> <modo>\n");
+		fprintf(stderr, "Sintaxis: ./escribir <nombre_dispositivo> <texto|ruta_fichero> <diferentes_inodos> <modo>\n");
         fprintf(stderr,"Offsets:");
-        for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
-            fprintf(stderr," %d,",offsets[j]);
+        fprintf(stderr," %d",offsets[0]);
+        for(int j = 1; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
+            fprintf(stderr,", %d",offsets[j]);
         }
         fprintf(stderr,"\nSi diferentes_inodos=0 se reserva un solo inodo para todos los offsets\n");
 		return -1;
@@ -36,7 +43,6 @@ int main(int argc, char **argv){
     //Inicializamos las variables
     int escritos;
     int ninodo;
-    //if(ninodo==-1) return EXIT_FAILURE;
     //struct inodo ino;
     struct STAT st;
     struct tm *ts;   //struct de la libreria <time.h>, nos sirve para guardar la hora        POSIBLE BORRAR
@@ -59,28 +65,24 @@ int main(int argc, char **argv){
 
         //Iniciamos la escritura
         printf("Offsets:");
-        for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
-            printf(" %d,",offsets[j]);
+        printf(" %d",offsets[0]);
+        for(int j = 1; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
+            printf(", %d",offsets[j]);
         }
         printf("\nLongitud texto: %ld\n\n", tam);
 
         //Un mismo inodo
         int diferentes_inodos = INODOS;
-        /*
-        if(INODOS==0){
-            ninodo= reservar_inodo('f',6);
-        }
-        */
+        
         for(int i = 0; i<(sizeof(offsets)/sizeof(offsets[0])); i++){
             //Si diferentes_inodo vale 1, reservaremos un nuevo inodo en cada iteracion
             if (diferentes_inodos || i == 0){
                 ninodo = reservar_inodo('f',6);
             }
-            /*
-            if(INODOS==1){
-                ninodo = reservar_inodo('f',6);
-            }
-            */
+            
+            printf("Nº Inodo reservado: %d\n", ninodo);
+            printf("Offset: %d\n", offsets[i]);
+
             escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
             if(escritos==-1) {
                 fprintf(stderr,"Error durante la escritura.\n");
@@ -98,18 +100,16 @@ int main(int argc, char **argv){
             strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
 
             //Imprimimos resultados
-            fprintf(stderr,"Nº Inodo reservado: %d\n", ninodo);
-            fprintf(stderr,"Offset: %d\n", offsets[i]);
-            fprintf(stderr,"Bytes escritos: %d\n", escritos);
-            fprintf(stderr,"DATOS INODO %d:\n...\n", ninodo);
-            fprintf(stderr,"Tipo=%c\n", st.tipo);
-            fprintf(stderr,"Permisos=%d\n", st.permisos);
-            fprintf(stderr,"Atime: %s\n", atime);
-            fprintf(stderr,"Mtime: %s\n", mtime);
-            fprintf(stderr,"Ctime: %s\n", ctime);
-            fprintf(stderr,"nlinks=%d\n", st.nlinks);
-            fprintf(stderr,"TamBytesLogicos: %d\n", st.tamEnBytesLog);
-            fprintf(stderr,"NumBloquesOcupados: %d\n\n\n", st.numBloquesOcupados);
+            printf("Bytes escritos: %d\n", escritos);
+            printf("\nDATOS INODO %d:\n", ninodo);
+            printf("Tipo=%c\n", st.tipo);
+            printf("Permisos=%d\n", st.permisos);
+            printf("atime: %s\n", atime);
+            printf("mtime: %s\n", mtime);
+            printf("ctime: %s\n", ctime);
+            printf("nlinks=%d\n", st.nlinks);
+            printf("TamBytesLogicos: %d\n", st.tamEnBytesLog);
+            printf("NumBloquesOcupados: %d\n\n", st.numBloquesOcupados);
         }
     } else if(MODO[1]=='t'){
         long tam = strlen(FICHERO);
@@ -119,28 +119,24 @@ int main(int argc, char **argv){
 
         //Iniciamos la escritura
         printf("Offsets:");
-        for(int j = 0; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
-            printf(" %d,",offsets[j]);
+        printf(" %d",offsets[0]);
+        for(int j = 1; j<(sizeof(offsets)/sizeof(offsets[0])); j++){
+            printf(", %d",offsets[j]);
         }
         printf("\nLongitud texto: %ld\n\n", tam);
 
         //Un mismo inodo
         int diferentes_inodos = INODOS;
-        /*
-        if(INODOS==0){
-            ninodo= reservar_inodo('f',6);
-        }
-        */
+
         for(int i = 0; i<(sizeof(offsets)/sizeof(offsets[0])); i++){
             //Si diferentes_inodo vale 1, reservaremos un nuevo inodo en cada iteracion
             if (diferentes_inodos || i == 0){
                 ninodo = reservar_inodo('f',6);
             }
-            /*
-            if(INODOS==1){
-                ninodo = reservar_inodo('f',6);
-            }
-            */
+            
+            printf("Nº Inodo reservado: %d\n", ninodo);
+            printf("Offset: %d\n", offsets[i]);
+
             escritos = mi_write_f(ninodo, buffer, offsets[i], tam);
             if(escritos==-1) {
                 fprintf(stderr,"Error durante la escritura.\n");
@@ -158,18 +154,16 @@ int main(int argc, char **argv){
             strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
 
             //Imprimimos resultados
-            fprintf(stderr,"Nº Inodo reservado: %d\n", ninodo);
-            fprintf(stderr,"Offset: %d\n", offsets[i]);
-            fprintf(stderr,"Bytes escritos: %d\n", escritos);
-            fprintf(stderr,"DATOS INODO %d:\n...\n", ninodo);
-            fprintf(stderr,"Tipo=%c\n", st.tipo);
-            fprintf(stderr,"Permisos=%d\n", st.permisos);
-            fprintf(stderr,"Atime: %s\n", atime);
-            fprintf(stderr,"Mtime: %s\n", mtime);
-            fprintf(stderr,"Ctime: %s\n", ctime);
-            fprintf(stderr,"nlinks=%d\n", st.nlinks);
-            fprintf(stderr,"TamBytesLogicos: %d\n", st.tamEnBytesLog);
-            fprintf(stderr,"NumBloquesOcupados: %d\n\n\n", st.numBloquesOcupados);
+            printf("Bytes escritos: %d\n", escritos);
+            printf("\nDATOS INODO %d:\n", ninodo);
+            printf("Tipo=%c\n", st.tipo);
+            printf("Permisos=%d\n", st.permisos);
+            printf("atime: %s\n", atime);
+            printf("mtime: %s\n", mtime);
+            printf("ctime: %s\n", ctime);
+            printf("nlinks=%d\n", st.nlinks);
+            printf("TamBytesLogicos: %d\n", st.tamEnBytesLog);
+            printf("NumBloquesOcupados: %d\n\n", st.numBloquesOcupados);
         }
     }
     

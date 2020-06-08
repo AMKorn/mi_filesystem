@@ -8,20 +8,7 @@ Andreas Manuel Korn
 Sergio Vega García
 Rubén López Babón
 
-**Posibles errores futuros o dudas:**
-1. ficheros_basico.c linea 550 no estoy completamente seguro de que esa sea la manera correcta de hacerlo.
-	** Incluir el inodo que queremos liberar en la lista de inodos libres (por el principio), actualizando el superbloque para que éste sea ahora el primero de la lista. El inodo liberado apuntará donde antes apuntaba el campo del superbloque. 
-	
-//Creo que ya no persiste:
-
-Después de  ./truncar disco 1 409605001 hacer ./leer_sf disco 
-	Debería:
-		cantBloquesLibres = 96851
-	En cambio:
-		cantBloquesLibres = 96825
-		
-**Mejoras**
-*Realizadas*
+**Mejoras realizadas**
 - mi_read y mi_write con cache
 - mi_ls: todas las mejoras
 - mi_touch
@@ -29,7 +16,6 @@ Después de  ./truncar disco 1 409605001 hacer ./leer_sf disco
 - Lectura de ficheros externos de escribir.c
 
 *Pendientes*
-- Nos queda:
 - mejoras liberar_bloques_inodo()
 - mejora init_MB()
 - SB memoria compartida
@@ -46,6 +32,11 @@ Después de  ./truncar disco 1 409605001 hacer ./leer_sf disco
 	- <modo> -> 2 modos 
 		+ -t, lectura directamente desde consola: escitura directa o cat.
 		+ -f, lectura desde fichero.
+- mi_ls.c
+	- Argumentos esperados: <disco> </ruta> <formato>
+	- <modo> -> 2 modos 
+		+ -s, formato simple.
+		+ -e, formato expandido.
 - verificacion.c 
 	- Argumentos esperados: ./verificacion <disco> </directorio>
 	- En </directorio> podemos usar "$(cat dir.txt)" en lugar de copiar y pegar la ruta, ya que simulacion.c guarda el directorio de trabajo en ese dichero
@@ -56,3 +47,5 @@ Después de  ./truncar disco 1 409605001 hacer ./leer_sf disco
 3. Extra nivel 10
 4. liberar_bloques_inodo es muy ineficiente, habria que mirar la manera de mejorarlo para la entrega final
 -------------------------------------------------------------------------------------------------------------
+
+El script scripte3.sh no se ejecuta correctamente, pero se puede copiar y pegar sus comandos 1 a 1 para una correcta valoracion de la practica

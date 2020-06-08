@@ -1,3 +1,10 @@
+/*
+* *** AUTORES:***
+* Andreas Manuel Korn
+* Sergio Vega García
+* Rubén López Babón
+*/
+
 #include "bloques.h"
 #include <time.h>
 #include <limits.h>

@@ -1,3 +1,9 @@
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
 #include "ficheros.h"
 
 int main(int argc, char **argv){

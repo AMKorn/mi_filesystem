@@ -1,12 +1,15 @@
-// * bloques.c *
-#include "bloques.h"
-#include "semaforo_mutex_posix.h"
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
 
+#include "bloques.h"
+#include "semaforo_mutex_posix.h"								 
 
 static int descriptor = 0;
 static sem_t *mutex;
-static unsigned int inside_sc = 0; //Para evitar que un wait se haga dos veces
-
+static unsigned int inside_sc = 0; //Para evitar que un wait se haga dos veces					
 
 /**
  * Abre el archivo pasado por parámetro o lo crea si es necesario.
@@ -14,11 +17,12 @@ static unsigned int inside_sc = 0; //Para evitar que un wait se haga dos veces
  * @return el descriptor de fichero del fichero abierto.
  */
 int bmount(const char *camino){
-    if(descriptor>0){
+	if(descriptor>0){
         close(descriptor);
-    }
+    }				 
     umask(000);
     if((descriptor = open(camino, O_RDWR|O_CREAT, 0666)) == -1){
+						 
         fprintf(stderr, "Error: bloques.c -> bmount() -> open()\n");    
     }
     if (!mutex) { //mutex == 0
@@ -68,7 +72,6 @@ int bread(unsigned int nbloque, void *buf){
     lseek(descriptor, nbloque*BLOCKSIZE, SEEK_SET);
     return read(descriptor, buf, BLOCKSIZE);
 }
-
 
 void mi_waitSem(){
     if (!inside_sc) {

@@ -1,3 +1,9 @@
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
 #include "directorios.h"
 
 #define DISCO argv[1]
@@ -16,6 +22,9 @@ int main(int argc, char **argv){
     }
     unsigned char buf[BLOCKSIZE];           // Preparamos el espacio para la información
     memset(buf, 0, BLOCKSIZE);              // y lo inicializamos a ceros.
+    for(int i = 0; i<NUM_BLOQUES; i++){
+        bwrite(i, buf);
+    }
     initSB(NUM_BLOQUES, NUM_BLOQUES/4);
     initMB();
     initAI();

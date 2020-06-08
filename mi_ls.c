@@ -1,3 +1,9 @@
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
 #include "directorios.h"
 
 #define DISCO argv[1]
@@ -14,7 +20,9 @@
 int main(int argc, char **argv){
     if(argc == 4){
 
-        bmount(DISCO);
+        if(bmount(DISCO) < 0){
+            return EXIT_FAILURE;
+        }
         
         char buffer[TAMBUFFER];
         memset(buffer, 0, sizeof(buffer));
@@ -51,7 +59,9 @@ int main(int argc, char **argv){
             return EXIT_FAILURE;
         }
     
-        bmount(DISCO);
+        if(bmount(DISCO) < 0){
+            return EXIT_FAILURE;
+        }
         
         char buffer[TAMBUFFER];
         memset(buffer, 0, sizeof(buffer));

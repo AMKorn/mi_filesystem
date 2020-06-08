@@ -1,3 +1,9 @@
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
 #include "ficheros_basico.h"
 
 struct STAT {                           // Struct que contiene la información de los inodos pero sin los punteros.

@@ -1,5 +1,11 @@
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
 #include "ficheros.h"
-#include "semaforo_mutex_posix.h"
+#include "semaforo_mutex_posix.h"								 
 
 /**
  * Escribe el contenido procedente de un buffer de memoria, buf_original, de tamaño nbytes, en un fichero/directorio
@@ -24,9 +30,9 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     int bytes = offset;
 
     // Preparación1 para la escritura de los bloques
-    mi_waitSem();//Semaforo 
+	mi_waitSem();//Semaforo						
     int nbloque = traducir_bloque_inodo(ninodo, primerBLogico, 1);
-    mi_signalSem();//Semaforo
+	mi_signalSem();//Semaforo						 
     if(nbloque == -1) return -1;
     unsigned char buf_bloque[BLOCKSIZE];
     if(bread(nbloque, buf_bloque) == -1){
@@ -53,9 +59,9 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
         
         // Bloques intermedios
         for(int i = primerBLogico+1; i < ultimoBLogico; i++){
-            mi_waitSem();//Semaforo 
+			mi_waitSem();//Semaforo						
             nbloque = traducir_bloque_inodo(ninodo, i, 1);
-            mi_signalSem();//Semaforo
+			mi_signalSem();//Semaforo						 
             if(bwrite(nbloque, buf_original + (BLOCKSIZE - desp1) + (i - primerBLogico - 1) * BLOCKSIZE) == -1){
                 fprintf(stderr, "mi_write_f(): Error de escritura de bloque. Bloques intermedios.\n");
                 return -1;
@@ -76,9 +82,8 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
         }        
         bytes += desp2+1;
     }
-    
     // Actualización de metainformación
-    mi_waitSem();//Semaforo
+	mi_waitSem();//Semaforo					   
     leer_inodo(ninodo, &inodo);
     if(inodo.tamEnBytesLog < bytes) {
         inodo.tamEnBytesLog = bytes;
@@ -86,7 +91,7 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
     }
     inodo.mtime = time(NULL);
     escribir_inodo(ninodo, inodo);
-    mi_signalSem();//Semaforo
+	mi_signalSem();//Semaforo						 
 
     return bytes - offset;
 }
@@ -171,8 +176,10 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
         leidos += desp2+1;
     }
 
+    
+
     // Actualización de metainformación
-    mi_waitSem();//Semaforo
+	mi_waitSem();//Semaforo					   
     leer_inodo(ninodo, &inodo);
     inodo.atime = time(NULL);
     if(escribir_inodo(ninodo, inodo) < 0){
@@ -214,29 +221,22 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
  * @return EXIT_SUCCESS o EXIT_FAILURE
  */
 int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
-    mi_waitSem();//Semaforo
+	mi_waitSem();//Semaforo					   
     struct inodo inodo;
     if(leer_inodo(ninodo, &inodo) == EXIT_FAILURE){
-        mi_signalSem();//Semaforo
+		mi_signalSem();//Semaforo						 
         return EXIT_FAILURE;
     }
-
-    /*
-    //Comprobar que tiene permisos de escritura
-    if((inodo.permisos & 2) != 2){
-        fprintf(stderr, "El inodo no tiene permisos de escritura.\n");
-        return EXIT_FAILURE;
-    }*/
 
     inodo.permisos = permisos;
 
     inodo.ctime = time(NULL);
 
     if(escribir_inodo(ninodo, inodo) == EXIT_FAILURE) {
-        mi_signalSem();//Semaforo
+		mi_signalSem();//Semaforo						 
         return EXIT_FAILURE;
     }
-    mi_signalSem();//Semaforo
+	mi_signalSem();//Semaforo
     return EXIT_SUCCESS;
 }
 
@@ -252,7 +252,7 @@ int mi_truncar_f(unsigned int ninodo, unsigned int nbytes){
     //Comprobar que tiene permisos de escritura y que nbytes <= tamEnBytesLog
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
-    if((inodo.permisos & 2) != 2){
+    if((inodo.permisos & MASC_WRTE) != MASC_WRTE){
         fprintf(stderr, "El inodo no tiene permisos de escritura.\n");
         return -1;
     }
@@ -280,13 +280,6 @@ int mi_truncar_f(unsigned int ninodo, unsigned int nbytes){
     inodo.numBloquesOcupados -= bloquesLiberados;
     
     escribir_inodo(ninodo, inodo);
-
-    printf("DATOS INODO %d:\n", ninodo);
-    printf("tipo=%c\n", inodo.tipo);
-    printf("...\n");
-    printf("tamEnBytesLog=%d\n", inodo.tamEnBytesLog);
-    printf("numBloquesOcupados=%d\n", inodo.numBloquesOcupados);
-
 
     return bloquesLiberados;
 }

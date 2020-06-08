@@ -1,3 +1,9 @@
+/* Autores:
+ * Andreas Manuel Korn
+ * Sergio Vega García
+ * Rubén López Babón
+ */
+
 #include "directorios.h"
 #include "semaforo_mutex_posix.h"
 
@@ -60,15 +66,12 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
 	memset(final, 0, strlen(camino_parcial));  
      
     memset(entrada.nombre, 0, sizeof(entrada.nombre));
-    //int camino;
-    if (extraer_camino (camino_parcial, inicial, final, &tipo) ==-1) return ERROR_CAMINO_INCORRECTO; 
 
-    //printf("[buscar_entrada()→ inicial: %s, final: %s, reservar: %d]\n", inicial, final, reservar);
+    if (extraer_camino (camino_parcial, inicial, final, &tipo) ==-1) return ERROR_CAMINO_INCORRECTO; 
 
     //buscamos la entrada cuyo nombre se encuentra en inicial
     if (leer_inodo(*p_inodo_dir, &inodo_dir)==-1) return ERROR_LECTURA_ESCRITURA;
     if ((inodo_dir.permisos &4) !=4) {
-        //printf("[buscar_entrada()→ El inodo %d no tiene permisos de lectura]\n", *p_inodo_dir);
         return ERROR_PERMISO_LECTURA;
     } 
 
@@ -95,7 +98,6 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
             case 1:  //modo escritura. 
                 //Creamos la entrada en el directorio referenciado por *p_inodo_dir
                 //si es fichero no permitir escritura 
-                //printf("Tipo1:  %c, Tipo2:  %c\n", inodo_dir.tipo,tipo);
                 if (inodo_dir.tipo == 'f'){ 
                     return ERROR_NO_SE_PUEDE_CREAR_ENTRADA_EN_UN_FICHERO;
                 }
@@ -103,20 +105,15 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
                 if((inodo_dir.permisos & 2) != 2){
                     return -8;
                 } else {
-                    //int res;
                     strcpy(entrada.nombre, inicial);                
                     if (tipo == 'd') {  // si es un directorio
                         if (strcmp(final, "/") == 0) { // Si es el último directorio
                             if ((entrada.ninodo = reservar_inodo('d', permisos))<0) return ERROR_RESERVAR_INODO;
-                            //printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d para %s]\n", entrada.ninodo, tipo, permisos, entrada.nombre);
-                            //printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);
                         } else { // Si cuelgan más diretorios o ficheros
                             return ERROR_NO_EXISTE_DIRECTORIO_INTERMEDIO;
                         }
                     }else{ // si es un fichero
                         if ((entrada.ninodo = reservar_inodo('f', permisos))<0) return ERROR_RESERVAR_INODO;
-                        //printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d para %s]\n", entrada.ninodo, tipo, permisos, entrada.nombre);
-                        //printf("[buscar_entrada()→ creada entrada: %s,  %d]\n",entrada.nombre, entrada.ninodo);      
                     }      
                     if(mi_write_f(*p_inodo_dir, &entrada, num_entrada_inodo*sizeof(struct entrada), sizeof(struct entrada)) == -1){
                         if(entrada.ninodo != -1) liberar_inodo(entrada.ninodo);
@@ -143,7 +140,6 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir, unsign
  * Función de impresión de los posibles errores causados por buscar_entrada().
  * */
 void mostrar_error_buscar_entrada(int error) {
-   // fprintf(stderr, "Error: %d\n", error);
    switch (error) {
    case -1: fprintf(stderr, "Error: Camino incorrecto.\n"); break;
    case -2: fprintf(stderr, "Error: Permiso denegado de lectura.\n"); break;
@@ -391,17 +387,7 @@ int mi_stat(const char *camino, struct STAT *p_stat){
     strftime(mtime, sizeof(mtime), "%a %Y-%m-%d %H:%M:%S", ts);
     ts = localtime(&p_stat->ctime);
     strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
-    /*
-    printf("Número de Inodo: %d\n", p_inodo);
-    printf("Tipo: %c\n", p_stat->tipo);
-    printf("Permisos %d\n", p_stat->permisos);
-    printf("atime: %s\n", atime);
-    printf("ctime: %s\n", ctime);
-    printf("mtime: %s\n", mtime);
-    printf("nlinks: %d\n", p_stat->nlinks);
-    printf("tamEnBytesLog: %d\n", p_stat->tamEnBytesLog);
-    printf("numBloquesOcupados: %d\n", p_stat->numBloquesOcupados);
-    */
+    
     return EXIT_SUCCESS;
 }
 
@@ -545,7 +531,6 @@ int mi_link(const char *camino1, const char *camino2){
         mi_signalSem();//Semaforo
         return EXIT_FAILURE;
     }
-    
     mi_signalSem();//Semaforo
     return EXIT_SUCCESS;
 }
@@ -559,7 +544,7 @@ int mi_link(const char *camino1, const char *camino2){
 int mi_unlink(const char *camino){
 
     //Declaraciones
-    mi_waitSem();//Semaforo 
+    mi_waitSem();//Semaforo
     unsigned int p_inodo_dir = 0;
     unsigned int p_inodo = 0;
     unsigned int p_entrada = 0;
@@ -603,7 +588,7 @@ int mi_unlink(const char *camino){
     if (p_entrada == nentradas-1){
         if(mi_truncar_f(p_inodo_dir,ino_dir.tamEnBytesLog - sizeof(struct entrada))==-1){
             fprintf(stderr,"Error en truncar\n");
-            mi_signalSem();//Semaforo
+			mi_signalSem();//Semaforo
             return -1;
         }
     //Si no es la última entrada, entonces tenemos que leer la última y colocarla en la posición de la entrada que queremos eliminar (p_entrada), 
@@ -611,23 +596,22 @@ int mi_unlink(const char *camino){
     //De esta manera siempre dejaremos las entradas de un directorio consecutivas para cuando tengamos que utilizar la función buscar_entrada()
     } else {
         if(mi_read_f(p_inodo_dir, &entrada, ino_dir.tamEnBytesLog-(sizeof(struct entrada)), sizeof(struct entrada)) == -1) {
-            mi_signalSem();//Semaforo
+			mi_signalSem();//Semaforo
             return -1;
         }
 		if(mi_write_f(p_inodo_dir,&entrada, p_entrada*(sizeof(struct entrada)), sizeof(struct entrada)) == -1) {
-            mi_signalSem();//Semaforo
+			mi_signalSem();//Semaforo
             return -1;
             }
         if(mi_truncar_f(p_inodo_dir,ino_dir.tamEnBytesLog - (sizeof(struct entrada)))==-1){
             fprintf(stderr,"2.Error en truncar\n");
-            mi_signalSem();//Semaforo
+			mi_signalSem();//Semaforo
             return -1;
         }
     }
 
     //FLAG1
     //Leemos el inodo asociado a la entrada eliminada para decrementar el nº de enlaces
-    //leer_inodo(p_inodo,&ino);
     ino.nlinks--;
     //Si no quedan enlaces (nlinks) entonces liberaremos el inodo, en caso contrario actualizamos su ctime y escribimos el inodo.
     if(ino.nlinks < 1){
@@ -636,10 +620,10 @@ int mi_unlink(const char *camino){
         ino.ctime = time(NULL);
         if(escribir_inodo(p_inodo, ino) < 0){
             fprintf(stderr,"Error al escribir inodo\n");
-            mi_signalSem();//Semaforo
+			mi_signalSem();//Semaforo
             return -1; //Error ESCRIBIR_INODO
         }
     }
-    mi_signalSem();//Semaforo
+	mi_signalSem();//Semaforo
     return EXIT_SUCCESS;
 }
