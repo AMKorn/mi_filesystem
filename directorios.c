@@ -550,12 +550,103 @@ int mi_link(const char *camino1, const char *camino2){
     return EXIT_SUCCESS;
 }
 
+
 /**
  * Función para borrar la entrada a un directorio (no vacio) o fichero
  * @param camino    - const char[] que incluye el camino a borrar.
  * @return          - EXIT_SUCCESS o EXIT_FAILURE
  * */
 int mi_unlink(const char *camino){
+
+    //Declaraciones
+    mi_waitSem();//Semaforo 
+    unsigned int p_inodo_dir = 0;
+    unsigned int p_inodo = 0;
+    unsigned int p_entrada = 0;
+    unsigned int nentradas;
+    char reservar=0;
+    char permisos=6;
+    struct inodo ino;
+    struct inodo ino_dir;
+    struct entrada entrada;
+
+    //Hay que comprobar que la entrada camino exista y obtener su nº de entrada (p_entrada), mediante la función buscar_entrada().
+    int e = buscar_entrada(camino, &p_inodo_dir, &p_inodo, &p_entrada, reservar, permisos);
+    if(e != EXIT_SUCCESS){
+        mostrar_error_buscar_entrada(e);
+        mi_signalSem();//Semaforo
+        return EXIT_FAILURE;
+    }
+
+    //Si se trata de un directorio  y no está vacío (inodo.tamEnBytesLog > 0) entonces no se puede borrar y salimos de la función. En caso contrario:
+    if (leer_inodo(p_inodo, &ino) == -1) {
+        fprintf(stderr, "Error al leer. No se pudo leer el inodo\n");
+        mi_signalSem();//Semaforo
+        return EXIT_FAILURE;
+    }
+    if (ino.tipo == 'd' && ino.tamEnBytesLog>0) {
+        fprintf(stderr,"El directorio no esta vacio, no se puede borrar\n");
+        mi_signalSem();//Semaforo
+        return EXIT_FAILURE;
+    }
+
+    //Mediante la función leer_inodo() leemos el inodo asociado al directorio que contiene la entrada que queremos eliminar (p_inodo_dir), 
+    //y obtenemos el nº de entradas que tiene (inodo_dir.tamEnBytesLog/sizeof(struct entrada))
+    if (leer_inodo(p_inodo_dir, &ino_dir) == -1) {
+        fprintf(stderr, "Error al leer. No se pudo leer el inodo\n");
+        mi_signalSem();//Semaforo
+        return EXIT_FAILURE;
+    }
+    nentradas = (ino_dir.tamEnBytesLog/sizeof(struct entrada));
+
+    //Si la entrada a eliminar es la última (p_entrada ==nº entradas - 1), basta con truncar el inodo a su tamaño menos el tamaño de una entrada, mediante la función mi_truncar_f()
+    if (p_entrada == nentradas-1){
+        if(mi_truncar_f(p_inodo_dir,ino_dir.tamEnBytesLog - sizeof(struct entrada))==-1){
+            fprintf(stderr,"Error en truncar\n");
+            mi_signalSem();//Semaforo
+            return -1;
+        }
+    //Si no es la última entrada, entonces tenemos que leer la última y colocarla en la posición de la entrada que queremos eliminar (p_entrada), 
+    //y después ya podemos truncar el inodo como en el caso anterior. 
+    //De esta manera siempre dejaremos las entradas de un directorio consecutivas para cuando tengamos que utilizar la función buscar_entrada()
+    } else {
+        if(mi_read_f(p_inodo_dir, &entrada, ino_dir.tamEnBytesLog-(sizeof(struct entrada)), sizeof(struct entrada)) == -1) {
+            mi_signalSem();//Semaforo
+            return -1;
+        }
+		if(mi_write_f(p_inodo_dir,&entrada, p_entrada*(sizeof(struct entrada)), sizeof(struct entrada)) == -1) {
+            mi_signalSem();//Semaforo
+            return -1;
+            }
+        if(mi_truncar_f(p_inodo_dir,ino_dir.tamEnBytesLog - (sizeof(struct entrada)))==-1){
+            fprintf(stderr,"2.Error en truncar\n");
+            mi_signalSem();//Semaforo
+            return -1;
+        }
+    }
+
+    //FLAG1
+    //Leemos el inodo asociado a la entrada eliminada para decrementar el nº de enlaces
+    //leer_inodo(p_inodo,&ino);
+    ino.nlinks--;
+    //Si no quedan enlaces (nlinks) entonces liberaremos el inodo, en caso contrario actualizamos su ctime y escribimos el inodo.
+    if(ino.nlinks < 1){
+        liberar_inodo(p_inodo);
+    } else {
+        ino.ctime = time(NULL);
+        if(escribir_inodo(p_inodo, ino) < 0){
+            fprintf(stderr,"Error al escribir inodo\n");
+            mi_signalSem();//Semaforo
+            return -1; //Error ESCRIBIR_INODO
+        }
+    }
+    mi_signalSem();//Semaforo
+    return EXIT_SUCCESS;
+}
+
+
+
+int mi_unlink2(const char *camino){
 
     mi_waitSem();//Semaforo
     unsigned int p_inodo_dir = 0;
@@ -618,3 +709,5 @@ int mi_unlink(const char *camino){
     mi_signalSem();//Semaforo
     return EXIT_SUCCESS;
 }
+
+

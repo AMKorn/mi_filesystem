@@ -27,8 +27,8 @@ echo "$ ./mi_ls disco /d1/"
 ./mi_ls disco /d1/
 echo "################################################################################"
 echo "# Eliminamos el subdirectorio sd3 de d1"
-echo "$ ./mi_rm disco /d1/sd3/"
-./mi_rm disco /d1/sd3/
+echo "$ ./mi_rmdir disco /d1/sd3/"
+./mi_rmdir disco /d1/sd3/
 echo "################################################################################"
 echo "# Mostramos la metainformacion de d1 para ver que ahora tiene 1 bloque de datos"
 echo "$ ./mi_stat disco /d1/"

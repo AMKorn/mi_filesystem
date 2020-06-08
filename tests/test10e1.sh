@@ -10,8 +10,8 @@ echo "##########################################################################
 echo "$ ./mi_mkdir disco 6 /dir1/dir11"
 ./mi_mkdir disco 6 /dir1/dir11/
 echo "################################################################################"
-echo "$ ./mi_mkdir disco 6 /dir1/dir11/fic1"
-./mi_mkdir disco 6 /dir1/dir11/fic1
+echo "$ ./mi_touch disco 6 /dir1/dir11/fic1"
+./mi_touch disco 6 /dir1/dir11/fic1
 echo "################################################################################"
 echo "$ ./mi_escribir disco /dir1/dir11/fic1 hellooooooo 0"
 ./mi_escribir disco /dir1/dir11/fic1 hellooooooo 0
@@ -37,8 +37,8 @@ echo "##########################################################################
 echo "$ ./mi_link disco /dir1/dir11/fic3 /dir2/dir21/fic4 #camino1 ha de existir"
 ./mi_link disco /dir1/dir11/fic3 /dir2/dir21/fic4
 echo "################################################################################"
-echo "$ ./mi_mkdir disco 6 /dir1/dir11/fic3"
-./mi_mkdir disco 6 /dir1/dir11/fic3
+echo "$ ./mi_touch disco 6 /dir1/dir11/fic3"
+./mi_touch disco 6 /dir1/dir11/fic3
 echo "################################################################################"
 echo "$ ./mi_link disco /dir1/dir11/fic3 /dir2/dir21/fic4"
 ./mi_link disco /dir1/dir11/fic3 /dir2/dir21/fic4
